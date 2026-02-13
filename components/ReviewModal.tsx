@@ -37,8 +37,10 @@ export default function ReviewModal({
         const dataDate = new Date(area.public_data_updated_at);
         const daysDiff = Math.floor((now.getTime() - dataDate.getTime()) / (1000 * 60 * 60 * 24));
         
-        // 최근 데이터일수록 높은 신뢰도 (30일 기준)
-        const trustScore = Math.max(50, Math.min(95, 95 - daysDiff));
+        // 기본 20% + 최근성 보너스 (30일 기준, 최대 +50%)
+        const recencyBonus = Math.max(0, Math.min(50, 50 - daysDiff * 1.5));
+        const trustScore = Math.round(20 + recencyBonus);
+        
         return { 
           trustScore, 
           availableRate: 1, 
@@ -104,7 +106,7 @@ export default function ReviewModal({
   const avgCleanliness =
     reviews.length > 0
       ? (reviews.reduce((sum, r) => sum + r.cleanliness, 0) / reviews.length).toFixed(1)
-      : "N/A";
+      : "❓";
 
   return (
     <div 
@@ -129,7 +131,7 @@ export default function ReviewModal({
         <div className="flex gap-4 mb-4 text-sm flex-wrap">
           <span>{area.is_indoor ? "🏠 실내" : "🌳 실외"}</span>
           <span>⭐ 청결도: {avgCleanliness}</span>
-          {area.verification_count && (
+          {!area.is_public_data && area.verification_count > 0 && (
             <span>👥 검증: {area.verification_count}명</span>
           )}
         </div>
