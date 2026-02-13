@@ -86,9 +86,7 @@ export default function Home() {
             <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 md:w-10 md:h-10" />
             <div className="flex items-center gap-2">
               <h1 className="text-xl md:text-2xl font-bold">BunnyAgit</h1>
-              {process.env.NODE_ENV === 'development' && (
-                <span className="text-xs bg-white/20 px-2 py-1 rounded">v.{buildTime}</span>
-              )}
+              <span className="text-xs bg-white/20 px-2 py-1 rounded">v.{buildTime}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
