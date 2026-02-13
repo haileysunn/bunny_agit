@@ -14,6 +14,9 @@ export type SmokingArea = {
   is_indoor: boolean;
   verification_count: number;
   is_verified: boolean;
+  is_public_data: boolean;
+  public_data_source?: string;
+  public_data_updated_at?: string;
   created_at: string;
   reporter_id?: string;
 };

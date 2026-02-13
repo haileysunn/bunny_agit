@@ -49,6 +49,7 @@ bunnyAgit은 단순한 흡연구역 찾기를 넘어, **흡연자들의 커뮤�
 - 🔍 **실시간 검색 기능** (이름/주소 검색)
 - 마커 클릭으로 상세 정보 확인
 - 내 위치로 이동 버튼
+- 🏢 **공공데이터 연동** (광진구 흡연구역 CSV 등록 완료, Open API 연동 예정)
 
 ### 🥕 아지트 제보
 - 새로운 흡연구역 등록
@@ -61,6 +62,7 @@ bunnyAgit은 단순한 흡연구역 찾기를 넘어, **흡연자들의 커뮤�
 - 5점 척도 청결도 평가
 - 이용 가능 여부 체크
 - 실시간 신뢰도 점수 (최근 7일 기준)
+- 공공데이터는 제공 시점 기준 신뢰도 부여
 - 사용자 코멘트 작성
 - 최신 리뷰 목록 표시
 
@@ -89,6 +91,7 @@ bunnyAgit은 단순한 흡연구역 찾기를 넘어, **흡연자들의 커뮤�
 ### External APIs
 - **Map**: Kakao Maps API
 - **Location**: Geolocation API
+- **Public Data**: [광진구 흡연구역 정보](https://www.data.go.kr/data/15097874) (공공데이터포털)
 
 ### Development Tools
 - **AI Assistant**: Amazon Q Developer (Vibe Coding)
@@ -199,9 +202,12 @@ npm run dev
 ### 테이블 구성
 
 - **smoking_areas**: 흡연구역 위치 및 정보
+  - 공공데이터 플래그 (`is_public_data`)
+  - 데이터 출처 (`public_data_source`)
+  - 업데이트 시점 (`public_data_updated_at`)
 - **reviews**: 리뷰 (청결도, 이용가능 여부, 코멘트)
 
-> 📖 자세한 스키마는 [데이터베이스 문서](docs/DATABASE.md) 참고
+> 📖 자세한 스키마는 [lib/schema.sql](lib/schema.sql) 참고
 
 ---
 
@@ -213,6 +219,7 @@ npm run dev
 | 😞 정보 없어서 불안 | 😄 리뷰로 미리 확인 |
 | 😣 혼자만 아는 정보 | 🤝 모두와 공유하는 지식 |
 | 😐 의미 없는 발품 | 🎁 포인트로 보상받기 |
+| 🤔 정보 신뢰도 의심 | 🏢 공공데이터 + 커뮤니티 검증 |
 
 ---
 

@@ -30,7 +30,25 @@ export default function ReviewModal({
   };
 
   const calculateTrust = () => {
-    if (reviews.length === 0) return null;
+    if (reviews.length === 0) {
+      // 공공데이터이고 리뷰가 없으면 데이터 제공 시점 기준 신뢰도
+      if (area.is_public_data && area.public_data_updated_at) {
+        const now = new Date();
+        const dataDate = new Date(area.public_data_updated_at);
+        const daysDiff = Math.floor((now.getTime() - dataDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // 최근 데이터일수록 높은 신뢰도 (30일 기준)
+        const trustScore = Math.max(50, Math.min(95, 95 - daysDiff));
+        return { 
+          trustScore, 
+          availableRate: 1, 
+          showWarning: false, 
+          latestReview: null,
+          isPublicData: true 
+        };
+      }
+      return null;
+    }
 
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -49,7 +67,7 @@ export default function ReviewModal({
     const isLatestRecent = new Date(latestReview.created_at) > oneDayAgo;
     const showWarning = isLatestRecent && !latestReview.is_available && availableRate > 0.5;
 
-    return { trustScore, availableRate, showWarning, latestReview };
+    return { trustScore, availableRate, showWarning, latestReview, isPublicData: false };
   };
 
   const trustData = calculateTrust();
@@ -100,6 +118,11 @@ export default function ReviewModal({
         <div className="flex items-center gap-2 mb-2">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
           <h2 className="text-2xl font-bold">{area.name}</h2>
+          {area.is_public_data && (
+            <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded" title={area.public_data_source}>
+              🏢 공공데이터
+            </span>
+          )}
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{area.address}</p>
         
@@ -122,12 +145,16 @@ export default function ReviewModal({
                 {trustData.trustScore >= 80 ? '🟢' : trustData.trustScore >= 50 ? '🟡' : '🔴'}
               </span>
               <span className="font-bold">신뢰도 {trustData.trustScore}%</span>
-              <span className="text-xs text-gray-600 dark:text-gray-400">(최근 7일 기준)</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {trustData.isPublicData ? '(공공데이터 기준)' : '(최근 7일 기준)'}
+              </span>
             </div>
-            <div className="text-xs text-gray-700 dark:text-gray-300">
-              이용가능 {Math.round(trustData.availableRate * 100)}% | 청결도 {avgCleanliness}
-            </div>
-            {trustData.showWarning && (
+            {!trustData.isPublicData && (
+              <div className="text-xs text-gray-700 dark:text-gray-300">
+                이용가능 {Math.round(trustData.availableRate * 100)}% | 청결도 {avgCleanliness}
+              </div>
+            )}
+            {trustData.showWarning && trustData.latestReview && (
               <div className="mt-2 text-sm text-orange-700 dark:text-orange-400 font-bold">
                 ⚠️ 최근 이용불가 리뷰 있음 ({new Date(trustData.latestReview.created_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })})
               </div>

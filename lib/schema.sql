@@ -17,6 +17,11 @@ CREATE TABLE smoking_areas (
   longitude DECIMAL(11, 8) NOT NULL,
   address VARCHAR(255) NOT NULL,
   is_indoor BOOLEAN DEFAULT false,
+  verification_count INTEGER DEFAULT 1,
+  is_verified BOOLEAN DEFAULT false,
+  is_public_data BOOLEAN DEFAULT false,
+  public_data_source VARCHAR(100),
+  public_data_updated_at TIMESTAMP,
   reporter_id UUID REFERENCES users(id),
   image_url TEXT,
   created_at TIMESTAMP DEFAULT NOW()
@@ -36,3 +41,7 @@ CREATE TABLE reviews (
 -- 인덱스
 CREATE INDEX idx_smoking_areas_location ON smoking_areas(latitude, longitude);
 CREATE INDEX idx_reviews_area ON reviews(area_id);
+
+-- 공공데이터 삽입 예시
+-- INSERT INTO smoking_areas (name, address, latitude, longitude, is_indoor, is_public_data, public_data_source, public_data_updated_at, verification_count, is_verified)
+-- VALUES ('서울시청 흡연구역', '서울 중구 세종대로 110', 37.5663, 126.9779, false, true, '서울시 공공데이터', NOW(), 10, true);

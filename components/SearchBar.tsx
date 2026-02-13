@@ -27,7 +27,7 @@ export default function SearchBar({
           placeholder="아지트 이름이나 주소로 검색..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-bunny-primary"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700 text-base focus:outline-none focus:ring-2 focus:ring-bunny-primary"
         />
         {query && (
           <button
