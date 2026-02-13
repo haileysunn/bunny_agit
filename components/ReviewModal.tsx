@@ -126,9 +126,9 @@ export default function ReviewModal({
         <div className="flex gap-4 mb-4 text-sm flex-wrap">
           <span>{area.is_indoor ? "🏠 실내" : "🌳 실외"}</span>
           <span>⭐ 청결도: {avgCleanliness}</span>
-          <span>
+          <span className="whitespace-nowrap">
             {area.is_public_data 
-              ? "👥 검증: 🏢 공공데이터" 
+              ? "👥 검증: 🏢공공" 
               : area.verification_count > 0 
                 ? `👥 검증: ${area.verification_count}명`
                 : "👥 검증: 0명"
@@ -148,7 +148,10 @@ export default function ReviewModal({
               </span>
               <span className="font-bold">신뢰도 {trustData.trustScore}%</span>
               <span className="text-xs text-gray-600 dark:text-gray-400">
-                {trustData.isPublicData ? '(공공데이터 기준)' : '(최근 7일 기준)'}
+                {trustData.isPublicData 
+                  ? `(데이터 연동: ${new Date(area.public_data_updated_at!).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })})` 
+                  : '(최근 7일 기준)'
+                }
               </span>
             </div>
             {!trustData.isPublicData && (

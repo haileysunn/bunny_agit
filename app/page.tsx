@@ -107,7 +107,7 @@ export default function Home() {
         </div>
       </header>
 
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSearch={handleSearch} areas={areas} />
 
       <main className="flex-1 relative">
         {loading ? (
