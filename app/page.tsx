@@ -18,6 +18,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  
+  const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toLocaleString('ko-KR', { 
+    month: '2-digit', 
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  }).replace(/[^0-9]/g, '');
 
   useEffect(() => {
     loadAreas();
@@ -76,7 +84,12 @@ export default function Home() {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 md:w-10 md:h-10" />
-            <h1 className="text-xl md:text-2xl font-bold">BunnyAgit</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-bold">BunnyAgit</h1>
+              {process.env.NODE_ENV === 'development' && (
+                <span className="text-xs bg-white/20 px-2 py-1 rounded">v.{buildTime}</span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
