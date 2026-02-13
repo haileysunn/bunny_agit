@@ -70,11 +70,11 @@ export default function ReportModal({
                   address: result[0].address.address_name
                 }));
               } else {
-                alert(`❌ 주소 변환 실패: ${status}`);
+                alert(`❌ 주소 변환 실패\nstatus: ${status}\nresult: ${JSON.stringify(result)}`);
               }
             });
           } else {
-            alert('❌ Geocoder API를 사용할 수 없습니다.');
+            alert(`❌ Geocoder API를 사용할 수 없습니다.\nwindow.kakao: ${!!window.kakao}\nwindow.kakao.maps: ${!!window.kakao?.maps}\nwindow.kakao.maps.services: ${!!window.kakao?.maps?.services}`);
           }
         });
 
