@@ -28,56 +28,65 @@ export default function ReportModal({
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current || !window.kakao) return;
+    if (!mapRef.current) return;
 
-    window.kakao.maps.load(() => {
-      const container = mapRef.current;
-      const options = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.978),
-        level: 3,
-      };
+    const loadKakaoMap = () => {
+      if (!window.kakao || !window.kakao.maps) {
+        setTimeout(loadKakaoMap, 100);
+        return;
+      }
 
-      mapInstance.current = new window.kakao.maps.Map(container, options);
-      markerInstance.current = new window.kakao.maps.Marker({
-        position: mapInstance.current.getCenter(),
-        map: mapInstance.current,
-      });
+      window.kakao.maps.load(() => {
+        const container = mapRef.current;
+        const options = {
+          center: new window.kakao.maps.LatLng(37.5665, 126.978),
+          level: 3,
+        };
 
-      window.kakao.maps.event.addListener(mapInstance.current, 'click', (mouseEvent: any) => {
-        const latlng = mouseEvent.latLng;
-        const lat = latlng.getLat();
-        const lng = latlng.getLng();
+        mapInstance.current = new window.kakao.maps.Map(container, options);
+        markerInstance.current = new window.kakao.maps.Marker({
+          position: mapInstance.current.getCenter(),
+          map: mapInstance.current,
+        });
 
-        markerInstance.current.setPosition(latlng);
-        setFormData(prev => ({
-          ...prev,
-          latitude: lat.toString(),
-          longitude: lng.toString(),
-        }));
+        window.kakao.maps.event.addListener(mapInstance.current, 'click', (mouseEvent: any) => {
+          const latlng = mouseEvent.latLng;
+          const lat = latlng.getLat();
+          const lng = latlng.getLng();
 
-        if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
-          const geocoder = new window.kakao.maps.services.Geocoder();
-          geocoder.coord2Address(lng, lat, (result: any, status: any) => {
-            if (status === window.kakao.maps.services.Status.OK && result[0]) {
-              setFormData(prev => ({
-                ...prev,
-                address: result[0].address.address_name
-              }));
-            } else {
-              alert(`❌ 주소 변환 실패: ${status}`);
-            }
-          });
-        } else {
-          alert('❌ Geocoder API를 사용할 수 없습니다.');
+          markerInstance.current.setPosition(latlng);
+          setFormData(prev => ({
+            ...prev,
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+          }));
+
+          if (window.kakao.maps.services) {
+            const geocoder = new window.kakao.maps.services.Geocoder();
+            geocoder.coord2Address(lng, lat, (result: any, status: any) => {
+              if (status === window.kakao.maps.services.Status.OK && result[0]) {
+                setFormData(prev => ({
+                  ...prev,
+                  address: result[0].address.address_name
+                }));
+              } else {
+                alert(`❌ 주소 변환 실패: ${status}`);
+              }
+            });
+          } else {
+            alert('❌ Geocoder API를 사용할 수 없습니다.');
+          }
+        });
+
+        if (currentLocation) {
+          const center = new window.kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+          mapInstance.current.setCenter(center);
+          markerInstance.current.setPosition(center);
         }
       });
+    };
 
-      if (currentLocation) {
-        const center = new window.kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
-        mapInstance.current.setCenter(center);
-        markerInstance.current.setPosition(center);
-      }
-    });
+    loadKakaoMap();
   }, [currentLocation]);
 
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
