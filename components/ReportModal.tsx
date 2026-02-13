@@ -167,7 +167,7 @@ export default function ReportModal({
     const { data: nearbyAreas } = await supabase.rpc('find_nearby_areas', {
       lat: reportLat,
       lng: reportLng,
-      radius: 50
+      radius: 5
     });
 
     let areaId;
