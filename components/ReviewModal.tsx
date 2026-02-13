@@ -90,18 +90,18 @@ export default function ReviewModal({
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto text-gray-900"
+        className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto text-gray-900 dark:text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-2">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
           <h2 className="text-2xl font-bold">{area.name}</h2>
         </div>
-        <p className="text-sm text-gray-600 mb-4">{area.address}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{area.address}</p>
         
         <div className="flex gap-4 mb-4 text-sm flex-wrap">
           <span>{area.is_indoor ? "🏠 실내" : "🌳 실외"}</span>
@@ -113,29 +113,29 @@ export default function ReviewModal({
 
         {trustData && (
           <div className={`mb-4 p-3 rounded ${
-            trustData.trustScore >= 80 ? 'bg-green-50 border border-green-200' :
-            trustData.trustScore >= 50 ? 'bg-yellow-50 border border-yellow-200' :
-            'bg-red-50 border border-red-200'
+            trustData.trustScore >= 80 ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' :
+            trustData.trustScore >= 50 ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
+            'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
           }`}>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">
                 {trustData.trustScore >= 80 ? '🟢' : trustData.trustScore >= 50 ? '🟡' : '🔴'}
               </span>
-              <span className="font-bold text-gray-900">신뢰도 {trustData.trustScore}%</span>
-              <span className="text-xs text-gray-600">(최근 7일 기준)</span>
+              <span className="font-bold">신뢰도 {trustData.trustScore}%</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">(최근 7일 기준)</span>
             </div>
-            <div className="text-xs text-gray-700">
+            <div className="text-xs text-gray-700 dark:text-gray-300">
               이용가능 {Math.round(trustData.availableRate * 100)}% | 청결도 {avgCleanliness}
             </div>
             {trustData.showWarning && (
-              <div className="mt-2 text-sm text-orange-700 font-bold">
+              <div className="mt-2 text-sm text-orange-700 dark:text-orange-400 font-bold">
                 ⚠️ 최근 이용불가 리뷰 있음 ({new Date(trustData.latestReview.created_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })})
               </div>
             )}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded">
           <h3 className="font-bold mb-2">리뷰 작성</h3>
           <div className="mb-2">
             <label className="block text-sm mb-1">청결도 (1-5)</label>
@@ -159,7 +159,7 @@ export default function ReviewModal({
           </label>
           <textarea
             placeholder="코멘트 (선택)"
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
@@ -176,10 +176,10 @@ export default function ReviewModal({
         <div>
           <h3 className="font-bold mb-2">최근 리뷰 ({reviews.length})</h3>
           {reviews.map((review) => (
-            <div key={review.id} className="border-b py-2">
+            <div key={review.id} className="border-b dark:border-gray-700 py-2">
               <div className="flex justify-between text-sm">
                 <span>⭐ {review.cleanliness}점</span>
-                <span className={review.is_available ? "text-green-600" : "text-red-600"}>
+                <span className={review.is_available ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
                   {review.is_available ? "✅ 이용가능" : "❌ 이용불가"}
                 </span>
               </div>
@@ -190,7 +190,7 @@ export default function ReviewModal({
 
         <button
           onClick={onClose}
-          className="w-full mt-4 bg-gray-300 py-2 rounded"
+          className="w-full mt-4 bg-gray-300 dark:bg-gray-600 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
         >
           닫기
         </button>
