@@ -329,9 +329,9 @@ export default function ReportModal({
             <button
               type="button"
               onClick={getCurrentLocation}
-              className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm shrink-0"
+              className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm shrink-0 whitespace-nowrap"
             >
-              📍 현재위치
+              현재 위치
             </button>
           </div>
           
