@@ -63,8 +63,12 @@ export default function ReportModal({
                 ...prev,
                 address: result[0].address.address_name
               }));
+            } else {
+              alert(`❌ 주소 변환 실패: ${status}`);
             }
           });
+        } else {
+          alert('❌ Geocoder API를 사용할 수 없습니다.');
         }
       });
 
