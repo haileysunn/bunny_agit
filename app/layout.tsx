@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Script
-          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
+          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
           strategy="beforeInteractive"
         />
         <AuthProvider>{children}</AuthProvider>
