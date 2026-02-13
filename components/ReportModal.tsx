@@ -22,6 +22,7 @@ export default function ReportModal({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstance = useRef<any>(null);
+  const addressSearchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     getCurrentLocation();
@@ -220,6 +221,39 @@ export default function ReportModal({
     onSuccess();
   };
 
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAddress = e.target.value;
+    setFormData({ ...formData, address: newAddress });
+
+    if (addressSearchTimeout.current) {
+      clearTimeout(addressSearchTimeout.current);
+    }
+
+    addressSearchTimeout.current = setTimeout(() => {
+      if (newAddress && window.kakao?.maps?.services) {
+        const geocoder = new window.kakao.maps.services.Geocoder();
+        geocoder.addressSearch(newAddress, (result: any, status: any) => {
+          if (status === window.kakao.maps.services.Status.OK && result[0]) {
+            const lat = parseFloat(result[0].y);
+            const lng = parseFloat(result[0].x);
+            
+            setFormData(prev => ({
+              ...prev,
+              latitude: lat.toString(),
+              longitude: lng.toString(),
+            }));
+
+            if (mapInstance.current && markerInstance.current) {
+              const position = new window.kakao.maps.LatLng(lat, lng);
+              mapInstance.current.setCenter(position);
+              markerInstance.current.setPosition(position);
+            }
+          }
+        });
+      }
+    }, 1000);
+  };
+
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -271,15 +305,6 @@ export default function ReportModal({
           <h2 className="text-2xl font-bold">새 아지트 제보</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div ref={mapRef} className="w-full h-48 md:h-64 rounded border border-gray-300 dark:border-gray-600" />
-          <p className="text-xs text-gray-600 dark:text-gray-400">📍 지도를 클릭하여 위치를 선택하세요</p>
-          <button
-            type="button"
-            onClick={getCurrentLocation}
-            className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm"
-          >
-            📍 현재 위치로 이동
-          </button>
           <input
             type="text"
             placeholder="장소명"
@@ -288,22 +313,53 @@ export default function ReportModal({
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
-          <input
-            type="text"
-            placeholder="주소"
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            required
-          />
-          <label className="flex items-center gap-2">
+          
+          <div ref={mapRef} className="w-full h-48 md:h-64 rounded border border-gray-300 dark:border-gray-600" />
+          <p className="text-xs text-gray-600 dark:text-gray-400">📍 지도를 클릭하여 위치를 선택하세요</p>
+          
+          <div className="flex gap-2">
             <input
-              type="checkbox"
-              checked={formData.is_indoor}
-              onChange={(e) => setFormData({ ...formData, is_indoor: e.target.checked })}
+              type="text"
+              placeholder="주소"
+              className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700"
+              value={formData.address}
+              onChange={handleAddressChange}
+              required
             />
-            🏠 실내
-          </label>
+            <button
+              type="button"
+              onClick={getCurrentLocation}
+              className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm shrink-0"
+            >
+              📍 현재위치
+            </button>
+          </div>
+          
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, is_indoor: false })}
+              className={`flex-1 py-3 rounded font-bold transition ${
+                !formData.is_indoor 
+                  ? 'bg-bunny-primary text-white' 
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              }`}
+            >
+              🌳 실외
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, is_indoor: true })}
+              className={`flex-1 py-3 rounded font-bold transition ${
+                formData.is_indoor 
+                  ? 'bg-bunny-primary text-white' 
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              }`}
+            >
+              🏠 실내
+            </button>
+          </div>
+          
           <div className="flex gap-2">
             <button
               type="submit"

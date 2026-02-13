@@ -110,7 +110,7 @@ export default function KakaoMap({
       <div ref={mapRef} className="w-full h-full" />
       <button
         onClick={moveToCurrentLocation}
-        className="absolute bottom-5 left-4 md:bottom-6 md:left-6 bg-white text-bunny-primary p-2 md:p-3 rounded-full shadow-lg hover:bg-gray-100 transition z-50 text-xl md:text-2xl"
+        className="absolute bottom-6 left-4 md:left-6 bg-white text-bunny-primary p-2 md:p-3 rounded-full shadow-lg hover:bg-gray-100 transition z-50 text-xl md:text-2xl"
         title="내 위치로 이동"
       >
         📍
