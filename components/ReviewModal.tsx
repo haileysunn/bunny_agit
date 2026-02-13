@@ -104,7 +104,7 @@ export default function ReviewModal({
         <p className="text-sm text-gray-600 mb-4">{area.address}</p>
         
         <div className="flex gap-4 mb-4 text-sm flex-wrap">
-          <span>{area.has_ashtray ? "🏠 실내" : "🌳 실외"}</span>
+          <span>{area.is_indoor ? "🏠 실내" : "🌳 실외"}</span>
           <span>⭐ 청결도: {avgCleanliness}</span>
           {area.verification_count && (
             <span>👥 검증: {area.verification_count}명</span>

@@ -93,8 +93,7 @@ export default function KakaoMap({
       const infowindow = new window.kakao.maps.InfoWindow({
         content: `<div style="padding:10px;font-size:12px;">
           <strong>🐰 ${area.name}</strong><br/>
-          ${area.has_ashtray ? "🪣 재떨이 있음" : ""} 
-          ${area.has_roof ? "☂️ 지붕 있음" : ""}
+          ${area.is_indoor ? "🏠 실내" : "🌳 실외"}
         </div>`,
       });
 

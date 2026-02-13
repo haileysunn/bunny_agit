@@ -15,8 +15,7 @@ export default function ReportModal({
     address: "",
     latitude: "",
     longitude: "",
-    has_ashtray: false,
-    has_roof: false,
+    is_indoor: false,
   });
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,8 +87,7 @@ export default function ReportModal({
           address: formData.address,
           latitude: reportLat,
           longitude: reportLng,
-          has_ashtray: formData.has_ashtray,
-          has_roof: formData.has_roof,
+          is_indoor: formData.is_indoor,
           verification_count: 1,
           is_verified: false
         }])
@@ -195,18 +193,10 @@ export default function ReportModal({
           <label className="flex items-center gap-2 text-gray-900">
             <input
               type="checkbox"
-              checked={formData.has_ashtray}
-              onChange={(e) => setFormData({ ...formData, has_ashtray: e.target.checked })}
+              checked={formData.is_indoor}
+              onChange={(e) => setFormData({ ...formData, is_indoor: e.target.checked })}
             />
-            🪣 재떨이 있음
-          </label>
-          <label className="flex items-center gap-2 text-gray-900">
-            <input
-              type="checkbox"
-              checked={formData.has_roof}
-              onChange={(e) => setFormData({ ...formData, has_roof: e.target.checked })}
-            />
-            ☂️ 지붕 있음
+            🏠 실내
           </label>
           <div className="flex gap-2">
             <button

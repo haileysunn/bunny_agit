@@ -11,8 +11,7 @@ export type SmokingArea = {
   latitude: number;
   longitude: number;
   address: string;
-  has_ashtray: boolean;
-  has_roof: boolean;
+  is_indoor: boolean;
   verification_count: number;
   is_verified: boolean;
   created_at: string;
