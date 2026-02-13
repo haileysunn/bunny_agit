@@ -244,13 +244,8 @@ export default function ReportModal({
                   ...prev,
                   address: address
                 }));
-                alert(`📍 현재 위치를 가져왔습니다!\n${address}`);
-              } else {
-                alert("📍 현재 위치를 가져왔습니다!");
               }
             });
-          } else {
-            alert("📍 현재 위치를 가져왔습니다!");
           }
         },
         (error) => {

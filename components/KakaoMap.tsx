@@ -41,39 +41,33 @@ export default function KakaoMap({
   useEffect(() => {
     if (!mapRef.current) return;
 
-    const script = document.createElement('script');
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`;
-    script.async = true;
-    document.head.appendChild(script);
-
-    script.onload = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          const container = mapRef.current;
-          const options = {
-            center: new window.kakao.maps.LatLng(37.5665, 126.978),
-            level: 3,
-          };
-
-          mapInstance.current = new window.kakao.maps.Map(container, options);
-
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-              const locPosition = new window.kakao.maps.LatLng(lat, lng);
-              mapInstance.current.setCenter(locPosition);
-            });
-          }
-        });
+    const initMap = () => {
+      if (!window.kakao || !window.kakao.maps) {
+        setTimeout(initMap, 100);
+        return;
       }
+
+      window.kakao.maps.load(() => {
+        const container = mapRef.current;
+        const options = {
+          center: new window.kakao.maps.LatLng(37.5665, 126.978),
+          level: 3,
+        };
+
+        mapInstance.current = new window.kakao.maps.Map(container, options);
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const locPosition = new window.kakao.maps.LatLng(lat, lng);
+            mapInstance.current.setCenter(locPosition);
+          });
+        }
+      });
     };
 
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
+    initMap();
   }, []);
 
   useEffect(() => {
