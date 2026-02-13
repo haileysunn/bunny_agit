@@ -59,7 +59,7 @@ export default function SearchBar({
 
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3" ref={dropdownRef}>
-      <form onSubmit={handleSubmit} className="container mx-auto flex gap-2 relative">
+      <form onSubmit={handleSubmit} className="container mx-auto flex gap-2">
         <div className="flex-1 relative">
           <input
             type="text"
@@ -89,14 +89,14 @@ export default function SearchBar({
           <button
             type="button"
             onClick={handleClear}
-            className="px-3 py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="px-3 py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 shrink-0"
           >
             ✕
           </button>
         )}
         <button
           type="submit"
-          className="px-4 py-2 bg-bunny-primary text-white rounded-lg hover:bg-bunny-secondary transition text-sm font-medium"
+          className="px-4 py-2 bg-bunny-primary text-white rounded-lg hover:bg-bunny-secondary transition text-sm font-medium shrink-0 whitespace-nowrap"
         >
           🔍 검색
         </button>
