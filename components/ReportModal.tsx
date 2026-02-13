@@ -69,12 +69,8 @@ export default function ReportModal({
                   ...prev,
                   address: result[0].address.address_name
                 }));
-              } else {
-                alert(`❌ 주소 변환 실패\nstatus: ${status}\nresult: ${JSON.stringify(result)}`);
               }
             });
-          } else {
-            alert(`❌ Geocoder API를 사용할 수 없습니다.\nwindow.kakao: ${!!window.kakao}\nwindow.kakao.maps: ${!!window.kakao?.maps}\nwindow.kakao.maps.services: ${!!window.kakao?.maps?.services}`);
           }
         });
 
@@ -108,13 +104,57 @@ export default function ReportModal({
     e.preventDefault();
     if (isSubmitting) return;
 
-    const reportLat = parseFloat(formData.latitude);
-    const reportLng = parseFloat(formData.longitude);
+    let reportLat = parseFloat(formData.latitude);
+    let reportLng = parseFloat(formData.longitude);
+
+    // 좌표가 없으면 주소로 찾기
+    if (!formData.latitude || !formData.longitude) {
+      if (!formData.address) {
+        alert("❌ 주소를 입력하거나 지도에서 위치를 선택해주세요.");
+        return;
+      }
+
+      setIsSubmitting(true);
+      
+      try {
+        const geocoder = new window.kakao.maps.services.Geocoder();
+        const result: any = await new Promise((resolve, reject) => {
+          geocoder.addressSearch(formData.address, (result: any, status: any) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              resolve(result);
+            } else {
+              reject(status);
+            }
+          });
+        });
+
+        if (result && result[0]) {
+          reportLat = parseFloat(result[0].y);
+          reportLng = parseFloat(result[0].x);
+          setFormData(prev => ({
+            ...prev,
+            latitude: reportLat.toString(),
+            longitude: reportLng.toString(),
+          }));
+        } else {
+          alert("❌ 주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.");
+          setIsSubmitting(false);
+          return;
+        }
+      } catch (error) {
+        alert("❌ 주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.");
+        setIsSubmitting(false);
+        return;
+      }
+    }
 
     if (!currentLocation) {
       alert("❌ 현재 위치를 가져오는 중입니다. 잠시만 기다려주세요.");
+      setIsSubmitting(false);
       return;
     }
+
+    if (!isSubmitting) setIsSubmitting(true);
 
     const distance = getDistance(currentLocation.lat, currentLocation.lng, reportLat, reportLng);
     if (distance > 100) {
