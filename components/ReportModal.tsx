@@ -55,15 +55,17 @@ export default function ReportModal({
           longitude: lng.toString(),
         }));
 
-        const geocoder = new window.kakao.maps.services.Geocoder();
-        geocoder.coord2Address(lng, lat, (result: any, status: any) => {
-          if (status === window.kakao.maps.services.Status.OK && result[0]) {
-            setFormData(prev => ({
-              ...prev,
-              address: result[0].address.address_name
-            }));
-          }
-        });
+        if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+          const geocoder = new window.kakao.maps.services.Geocoder();
+          geocoder.coord2Address(lng, lat, (result: any, status: any) => {
+            if (status === window.kakao.maps.services.Status.OK && result[0]) {
+              setFormData(prev => ({
+                ...prev,
+                address: result[0].address.address_name
+              }));
+            }
+          });
+        }
       });
 
       if (currentLocation) {
