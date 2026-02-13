@@ -18,6 +18,7 @@ export default function KakaoMap({
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
 
   const moveToCurrentLocation = () => {
     if (!mapInstance.current) return;
@@ -73,16 +74,28 @@ export default function KakaoMap({
   useEffect(() => {
     if (!mapInstance.current || !window.kakao) return;
 
+    // 기존 마커 제거
+    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current = [];
+
+    if (areas.length === 0) return;
+
+    const bounds = new window.kakao.maps.LatLngBounds();
+
     areas.forEach((area) => {
       const position = new window.kakao.maps.LatLng(
         area.latitude,
         area.longitude
       );
 
+      bounds.extend(position);
+
       const marker = new window.kakao.maps.Marker({
         position,
         map: mapInstance.current,
       });
+
+      markersRef.current.push(marker);
 
       const infowindow = new window.kakao.maps.InfoWindow({
         content: `<div style="padding:10px;font-size:12px;">
@@ -103,6 +116,11 @@ export default function KakaoMap({
         infowindow.close();
       });
     });
+
+    // 검색 결과에 맞춰 지도 이동
+    if (areas.length > 0) {
+      mapInstance.current.setBounds(bounds);
+    }
   }, [areas, onAreaClick]);
 
   return (

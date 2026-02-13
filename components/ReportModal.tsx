@@ -308,7 +308,7 @@ export default function ReportModal({
           <input
             type="text"
             placeholder="장소명"
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-base"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -321,7 +321,7 @@ export default function ReportModal({
             <input
               type="text"
               placeholder="주소"
-              className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700"
+              className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-base"
               value={formData.address}
               onChange={handleAddressChange}
               required

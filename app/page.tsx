@@ -70,7 +70,12 @@ export default function Home() {
       area.address?.toLowerCase().includes(query.toLowerCase())
     );
     setFilteredAreas(filtered);
-    setToast({ message: `${filtered.length}개의 아지트를 찾았습니다`, type: "info" });
+    
+    if (filtered.length > 0) {
+      setToast({ message: `${filtered.length}개의 아지트를 찾았습니다`, type: "info" });
+    } else {
+      setToast({ message: "검색 결과가 없습니다", type: "info" });
+    }
   };
 
   const handleAreaClick = (area: SmokingArea) => {

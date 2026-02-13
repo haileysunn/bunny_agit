@@ -120,20 +120,20 @@ export default function ReviewModal({
         <div className="flex items-center gap-2 mb-2">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
           <h2 className="text-2xl font-bold">{area.name}</h2>
-          {area.is_public_data && (
-            <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded" title={area.public_data_source}>
-              🏢 공공데이터
-            </span>
-          )}
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{area.address}</p>
         
         <div className="flex gap-4 mb-4 text-sm flex-wrap">
           <span>{area.is_indoor ? "🏠 실내" : "🌳 실외"}</span>
           <span>⭐ 청결도: {avgCleanliness}</span>
-          {!area.is_public_data && area.verification_count > 0 && (
-            <span>👥 검증: {area.verification_count}명</span>
-          )}
+          <span>
+            {area.is_public_data 
+              ? "👥 검증: 🏢 공공데이터" 
+              : area.verification_count > 0 
+                ? `👥 검증: ${area.verification_count}명`
+                : "👥 검증: 0명"
+            }
+          </span>
         </div>
 
         {trustData && (
@@ -188,7 +188,7 @@ export default function ReviewModal({
           </label>
           <textarea
             placeholder="코멘트 (선택)"
-            className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white"
+            className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white text-base"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
