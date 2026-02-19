@@ -12,7 +12,7 @@ import { supabase, SmokingArea } from "@/lib/supabase";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [areas, setAreas] = useState<SmokingArea[]>([]);
   const [filteredAreas, setFilteredAreas] = useState<SmokingArea[]>([]);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -113,7 +113,7 @@ export default function Home() {
                   <div className="text-xs">{user.rank} | {user.points}P</div>
                 </div>
                 <button
-                  onClick={logout}
+                  onClick={signOut}
                   className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
                 >
                   로그아웃
