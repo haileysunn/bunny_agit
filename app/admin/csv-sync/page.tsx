@@ -107,7 +107,7 @@ export default function CSVSyncPage() {
           .eq('latitude', lat)
           .eq('longitude', lng)
           .eq('is_public_data', true)
-          .single();
+          .maybeSingle();
         
         if (existing) { skipped++; continue; }
         
@@ -124,7 +124,12 @@ export default function CSVSyncPage() {
           is_verified: true,
         });
         
-        error ? skipped++ : inserted++;
+        if (error) {
+          console.error('Insert error:', error);
+          failed++;
+        } else {
+          inserted++;
+        }
       }
       
       setResult(`✅ ${inserted}개 추가, ⏭️ ${skipped}개 스킵, ❌ ${failed}개 실패`);
