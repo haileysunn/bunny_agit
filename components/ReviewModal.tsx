@@ -19,6 +19,7 @@ export default function ReviewModal({
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function ReviewModal({
       setComment("");
       setCleanliness(5);
       setIsAvailable(true);
+      setShowReviewForm(false);
     }
   };
 
@@ -227,44 +229,81 @@ export default function ReviewModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded">
-          <h3 className="font-bold mb-2">리뷰 작성</h3>
-          <div className="mb-2">
-            <label className="block text-sm mb-1">청결도 (1-5)</label>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={cleanliness}
-              onChange={(e) => setCleanliness(Number(e.target.value))}
-              className="w-full"
+        {showReviewForm ? (
+          <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold">리뷰 작성</h3>
+              <button
+                type="button"
+                onClick={() => setShowReviewForm(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mb-2">
+              <label className="block text-sm mb-2">청결도 ({cleanliness}점)</label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((score) => (
+                  <div key={score} className="relative inline-block">
+                    <button
+                      type="button"
+                      onClick={() => setCleanliness(score - 0.5)}
+                      className="absolute left-0 w-1/2 h-full z-10"
+                      style={{ opacity: 0 }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCleanliness(score)}
+                      className="text-3xl transition hover:scale-110 relative"
+                    >
+                      {cleanliness >= score ? (
+                        <span>⭐</span>
+                      ) : cleanliness >= score - 0.5 ? (
+                        <span className="relative inline-block">
+                          <span className="text-gray-300 dark:text-gray-600">★</span>
+                          <span className="absolute left-0 top-0 overflow-hidden" style={{ width: '50%' }}>⭐</span>
+                        </span>
+                      ) : (
+                        <span className="text-gray-300 dark:text-gray-600">★</span>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <label className="flex items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                checked={isAvailable}
+                onChange={(e) => setIsAvailable(e.target.checked)}
+              />
+              이용 가능
+            </label>
+            <textarea
+              placeholder="코멘트"
+              className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white text-base"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={3}
+              required
             />
-            <span className="text-sm">{cleanliness}점</span>
-          </div>
-          <label className="flex items-center gap-2 mb-2">
-            <input
-              type="checkbox"
-              checked={isAvailable}
-              onChange={(e) => setIsAvailable(e.target.checked)}
-            />
-            이용 가능
-          </label>
-          <textarea
-            placeholder="코멘트"
-            className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white text-base"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={3}
-            required
-          />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-bunny-primary text-white py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? "등록 중..." : "리뷰 등록"}
+            </button>
+          </form>
+        ) : (
           <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-bunny-primary text-white py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={() => setShowReviewForm(true)}
+            className="w-full mb-6 p-4 bg-bunny-primary text-white rounded font-bold hover:bg-bunny-secondary transition"
           >
-            {isSubmitting ? "등록 중..." : "리뷰 등록"}
+            📝 리뷰 작성 ({user ? '50P 적립' : '비회원 가능'})
           </button>
-        </form>
+        )}
 
         <div>
           <h3 className="font-bold mb-2">최근 리뷰 ({reviews.length})</h3>
