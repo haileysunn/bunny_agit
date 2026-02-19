@@ -6,6 +6,7 @@ import ReportModal from "@/components/ReportModal";
 import ReviewModal from "@/components/ReviewModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
+import AlertModal from "@/components/AlertModal";
 import SearchBar from "@/components/SearchBar";
 import LoginModal from "@/components/LoginModal";
 import ProfileModal from "@/components/ProfileModal";
@@ -23,6 +24,7 @@ export default function Home() {
   const [selectedArea, setSelectedArea] = useState<SmokingArea | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
   const [darkMode, setDarkMode] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
@@ -93,7 +95,7 @@ export default function Home() {
       .select("*")
       .eq("is_verified", true);
     if (error) {
-      setToast({ message: "데이터를 불러오는데 실패했습니다", type: "error" });
+      setAlert({ message: "데이터를 불러오는데 실패했습니다", type: "error" });
     } else if (data) {
       setAreas(data);
     }
@@ -228,6 +230,14 @@ export default function Home() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+
+      {alert && (
+        <AlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
         />
       )}
     </div>

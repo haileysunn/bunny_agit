@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
+import AlertModal from "./AlertModal";
 
 const gifts = [
   { name: "스타벅스 아메리카노", points: 500 },
@@ -13,10 +14,11 @@ const gifts = [
 
 export default function GiftShop({ onClose }: { onClose: () => void }) {
   const { user, addPoints } = useAuth();
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
 
   const handleExchange = async (gift: typeof gifts[0]) => {
     if (!user || user.points < gift.points) {
-      return alert("포인트가 부족합니다!");
+      return setAlert({ message: "포인트가 부족합니다!", type: "error" });
     }
 
     const { error } = await supabase.from("gift_exchanges").insert([
@@ -25,7 +27,7 @@ export default function GiftShop({ onClose }: { onClose: () => void }) {
 
     if (!error) {
       await addPoints(-gift.points);
-      alert(`${gift.name} 교환 완료!`);
+      setAlert({ message: `${gift.name} 교환 완료!`, type: "success" });
     }
   };
 
@@ -60,6 +62,14 @@ export default function GiftShop({ onClose }: { onClose: () => void }) {
           닫기
         </button>
       </div>
+
+      {alert && (
+        <AlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
     </div>
   );
 }

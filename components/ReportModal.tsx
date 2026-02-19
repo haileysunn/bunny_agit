@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
+import AlertModal from "./AlertModal";
 
 export default function ReportModal({
   onClose,
@@ -21,6 +22,7 @@ export default function ReportModal({
   });
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstance = useRef<any>(null);
@@ -113,7 +115,7 @@ export default function ReportModal({
     // 좌표가 없으면 주소로 찾기
     if (!formData.latitude || !formData.longitude) {
       if (!formData.address) {
-        alert("❌ 주소를 입력하거나 지도에서 위치를 선택해주세요.");
+        setAlert({ message: "주소를 입력하거나 지도에서 위치를 선택해주세요.", type: "error" });
         return;
       }
 
@@ -140,28 +142,27 @@ export default function ReportModal({
             longitude: reportLng.toString(),
           }));
         } else {
-          alert("❌ 주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.");
+          setAlert({ message: "주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.", type: "error" });
           setIsSubmitting(false);
           return;
         }
       } catch (error) {
-        alert("❌ 주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.");
+        setAlert({ message: "주소를 찾을 수 없습니다. 지도에서 직접 선택해주세요.", type: "error" });
         setIsSubmitting(false);
         return;
       }
     }
 
     if (!currentLocation) {
-      alert("❌ 현재 위치를 가져오는 중입니다. 잠시만 기다려주세요.");
+      setAlert({ message: "현재 위치를 가져오는 중입니다. 잠시만 기다려주세요.", type: "warning" });
       setIsSubmitting(false);
       return;
     }
 
-    if (!isSubmitting) setIsSubmitting(true);
-
     const distance = getDistance(currentLocation.lat, currentLocation.lng, reportLat, reportLng);
     if (distance > 100) {
-      alert(`❌ 제보 위치와 너무 멀리 떨어져 있습니다. (현재 ${Math.round(distance)}m)\n제보는 100m 이내에서만 가능합니다.`);
+      setAlert({ message: `제보 위치와 너무 멀리 떨어져 있습니다. (현재 ${Math.round(distance)}m)\n제보는 100m 이내에서만 가능합니다.`, type: "error" });
+      setIsSubmitting(false);
       return;
     }
 
@@ -222,11 +223,11 @@ export default function ReportModal({
     setIsSubmitting(false);
     
     if (verificationCount >= 3) {
-      alert(`✅ 제보 완료! 검증 완료되어 지도에 표시됩니다.`);
+      setAlert({ message: "제보 완료! 검증 완료되어 지도에 표시됩니다.", type: "success" });
     } else {
-      alert(`✅ 제보 완료! (${verificationCount}/3명)\n3명 이상 제보 시 지도에 표시됩니다.`);
+      setAlert({ message: `제보 완료! (${verificationCount}/3명)\n3명 이상 제보 시 지도에 표시됩니다.`, type: "success" });
     }
-    onSuccess();
+    setTimeout(() => onSuccess(), 1500);
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,11 +271,11 @@ export default function ReportModal({
           const lng = position.coords.longitude;
           
           setCurrentLocation({ lat, lng });
-          setFormData({
-            ...formData,
+          setFormData(prev => ({
+            ...prev,
             latitude: lat.toString(),
             longitude: lng.toString(),
-          });
+          }));
           
           // Kakao Geocoder로 주소 가져오기
           if (window.kakao && window.kakao.maps) {
@@ -291,11 +292,11 @@ export default function ReportModal({
           }
         },
         (error) => {
-          alert("❌ 위치 정보를 가져올 수 없습니다. 브라우저 설정에서 위치 권한을 허용해주세요.");
+          setAlert({ message: "위치 정보를 가져올 수 없습니다. 브라우저 설정에서 위치 권한을 허용해주세요.", type: "error" });
         }
       );
     } else {
-      alert("❌ 이 브라우저는 위치 정보를 지원하지 않습니다.");
+      setAlert({ message: "이 브라우저는 위치 정보를 지원하지 않습니다.", type: "error" });
     }
   };
 
@@ -388,6 +389,14 @@ export default function ReportModal({
           </div>
         </form>
       </div>
+
+      {alert && (
+        <AlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
     </div>
   );
 }

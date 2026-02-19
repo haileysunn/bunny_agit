@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SmokingArea } from "@/lib/supabase";
+import AlertModal from "./AlertModal";
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ export default function KakaoMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
 
   const moveToCurrentLocation = () => {
     if (!mapInstance.current) return;
@@ -31,11 +33,11 @@ export default function KakaoMap({
           mapInstance.current.setCenter(locPosition);
         },
         (error) => {
-          alert("❌ 위치 정보를 가져올 수 없습니다. 브라우저 설정에서 위치 권한을 허용해주세요.");
+          setAlert({ message: "위치 정보를 가져올 수 없습니다. 브라우저 설정에서 위치 권한을 허용해주세요.", type: "error" });
         }
       );
     } else {
-      alert("❌ 이 브라우저는 위치 정보를 지원하지 않습니다.");
+      setAlert({ message: "이 브라우저는 위치 정보를 지원하지 않습니다.", type: "error" });
     }
   };
 
@@ -124,15 +126,25 @@ export default function KakaoMap({
   }, [areas, onAreaClick]);
 
   return (
-    <div className="relative w-full h-full">
-      <div ref={mapRef} className="w-full h-full" />
-      <button
-        onClick={moveToCurrentLocation}
-        className="absolute bottom-6 left-4 md:left-6 bg-white text-bunny-primary p-2 md:p-3 rounded-full shadow-lg hover:bg-gray-100 transition z-50 text-xl md:text-2xl"
-        title="내 위치로 이동"
-      >
-        📍
-      </button>
-    </div>
+    <>
+      <div className="relative w-full h-full">
+        <div ref={mapRef} className="w-full h-full" />
+        <button
+          onClick={moveToCurrentLocation}
+          className="absolute bottom-6 left-4 md:left-6 bg-white text-bunny-primary p-2 md:p-3 rounded-full shadow-lg hover:bg-gray-100 transition z-50 text-xl md:text-2xl"
+          title="내 위치로 이동"
+        >
+          📍
+        </button>
+      </div>
+
+      {alert && (
+        <AlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
+    </>
   );
 }
