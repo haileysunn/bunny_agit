@@ -80,7 +80,10 @@ export default function CSVSyncPage() {
         
         const values = lines[i].split(',');
         const row: any = {};
-        headers.forEach((h, idx) => row[h] = values[idx]?.trim() || '');
+        headers.forEach((h, idx) => {
+          const value = values[idx]?.trim() || '';
+          row[h] = value.replace(/^"|"$/g, ''); // 큰따옴표 제거
+        });
         
         let lat = mapping.lat ? parseFloat(row[mapping.lat] || '0') : 0;
         let lng = mapping.lng ? parseFloat(row[mapping.lng] || '0') : 0;
