@@ -5,7 +5,6 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nickname VARCHAR(50) UNIQUE NOT NULL,
   points INTEGER DEFAULT 0,
-  rank VARCHAR(20) DEFAULT '새끼 토끼',
   created_at TIMESTAMP DEFAULT NOW()
 );
 
