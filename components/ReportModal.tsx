@@ -310,7 +310,8 @@ export default function ReportModal({
         className="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 w-full max-w-md text-gray-900 dark:text-white max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-2 mb-4">
-          <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
+          <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8 dark:hidden" />
+          <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 hidden dark:block" />
           <h2 className="text-2xl font-bold">새 아지트 제보</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -163,7 +163,8 @@ export default function ReviewModal({
         className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto text-gray-900 dark:text-white"
       >
         <div className="flex items-center gap-2 mb-2">
-          <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
+          <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8 dark:hidden" />
+          <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 hidden dark:block" />
           <h2 className="text-2xl font-bold flex-1">{area.name}</h2>
           <button
             onClick={toggleFavorite}
