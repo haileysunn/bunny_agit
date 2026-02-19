@@ -59,6 +59,11 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
       return;
     }
 
+    if (nickname.trim() === user.nickname) {
+      setAlert({ message: "기존 닉네임과 동일합니다.", type: "info" });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const { data: existing } = await supabase

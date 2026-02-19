@@ -131,9 +131,12 @@ export default function Home() {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 md:w-10 md:h-10" />
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl md:text-2xl font-bold">BunnyAgit</h1>
-              {isDev && <span className="text-xs bg-white/20 px-2 py-1 rounded">v.{buildTime}</span>}
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl md:text-2xl font-bold">BunnyAgit</h1>
+                {isDev && <span className="text-xs bg-white/20 px-2 py-1 rounded">v.{buildTime}</span>}
+              </div>
+              <p className="text-xs md:text-sm text-white/90">길 위에서 찾은 우리만의 아지트</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -177,7 +180,6 @@ export default function Home() {
                 로그인
               </button>
             )}
-            <p className="text-xs md:text-sm hidden md:block">길 위에서 찾은 우리만의 아지트</p>
           </div>
         </div>
       </header>
@@ -213,7 +215,10 @@ export default function Home() {
       {showReviewModal && selectedArea && (
         <ReviewModal
           area={selectedArea}
-          onClose={() => setShowReviewModal(false)}
+          onClose={() => {
+            setShowReviewModal(false);
+            if (user) loadFavorites();
+          }}
         />
       )}
 
