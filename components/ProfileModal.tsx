@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 import AlertModal from "./AlertModal";
 import ConfirmModal from "./ConfirmModal";
+import { getUserRank } from "@/lib/userLevel";
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const { user, session, refreshUser, deleteAccount } = useAuth();
@@ -19,7 +20,8 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const providerLabel = provider === "google" ? "🔵 구글" : "📧 이메일";
 
   const handleDelete = async () => {
-    const confirmMsg = `정말로 탈퇴하시겠습니까?\n\n삭제되는 데이터:\n• 닉네임: ${user?.nickname}\n• 랭크: ${user?.rank}\n• 포인트: ${user?.points}P\n• 즐겨찾기 목록\n\n유지되는 데이터:\n• 작성한 리뷰 (익명 처리)\n• 제보한 아지트 (익명 처리)\n\n⚠️ 탈퇴 후 복구가 불가능합니다.`;
+    const userRank = getUserRank(user?.points || 0);
+    const confirmMsg = `정말로 탈퇴하시겠습니까?\n\n삭제되는 데이터:\n• 닉네임: ${user?.nickname}\n• 랭크: ${userRank.title}\n• 포인트: ${user?.points}P\n• 즐겨찾기 목록\n\n유지되는 데이터:\n• 작성한 리뷰 (익명 처리)\n• 제보한 아지트 (익명 처리)\n\n⚠️ 탈퇴 후 복구가 불가능합니다.`;
     
     setConfirm({
       message: confirmMsg,
@@ -135,7 +137,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
               </div>
               <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400">랭크</span>
-                <span className="font-bold text-bunny-secondary">{user?.rank}</span>
+                <span className="font-bold text-bunny-secondary">{getUserRank(user?.points || 0).title}</span>
               </div>
               <div className="flex justify-between items-center py-2">
                 <span className="text-gray-600 dark:text-gray-400">포인트</span>

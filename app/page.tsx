@@ -12,6 +12,7 @@ import LoginModal from "@/components/LoginModal";
 import ProfileModal from "@/components/ProfileModal";
 import { supabase, SmokingArea } from "@/lib/supabase";
 import { useAuth } from "@/components/AuthProvider";
+import { getUserRank } from "@/lib/userLevel";
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -163,7 +164,7 @@ export default function Home() {
                   className="text-right hidden sm:block hover:bg-white/10 px-2 py-1 rounded transition"
                 >
                   <div className="text-sm font-bold">{user.nickname}</div>
-                  <div className="text-xs">{user.rank} | {user.points}P</div>
+                  <div className="text-xs">{getUserRank(user.points).title} | {user.points}P</div>
                 </button>
                 <button
                   onClick={signOut}
