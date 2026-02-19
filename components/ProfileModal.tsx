@@ -119,7 +119,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
             </div>
             <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
               <span className="text-gray-600 dark:text-gray-400">랭크</span>
-              <span className="font-bold text-bunny-primary">{user?.rank}</span>
+              <span className="font-bold text-bunny-secondary">{user?.rank}</span>
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-gray-600 dark:text-gray-400">포인트</span>

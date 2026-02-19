@@ -149,7 +149,7 @@ export default function Home() {
         
         <button
           onClick={() => setShowReportModal(true)}
-          className="absolute bottom-6 right-4 md:right-6 bg-bunny-primary text-white px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:bg-bunny-secondary transition z-50 text-sm md:text-base"
+          className="absolute bottom-6 right-4 md:right-6 bg-bunny-secondary text-gray-900 px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:bg-yellow-500 transition z-50 text-sm md:text-base font-bold"
         >
           🥕 제보
         </button>

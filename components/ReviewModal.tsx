@@ -168,7 +168,7 @@ export default function ReviewModal({
           <h2 className="text-2xl font-bold flex-1">{area.name}</h2>
           <button
             onClick={toggleFavorite}
-            className="text-2xl hover:scale-110 transition"
+            className="text-2xl hover:scale-110 transition text-bunny-secondary"
             title={isFavorite ? "즐겨찾기 제거" : "즐겨찾기 추가"}
           >
             {isFavorite ? "⭐" : "☆"}
