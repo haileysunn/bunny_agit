@@ -6,9 +6,9 @@ import { useAuth } from "./AuthProvider";
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const { user, session, refreshUser, deleteAccount } = useAuth();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [nickname, setNickname] = useState(user?.nickname || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const provider = session?.user?.app_metadata?.provider || "email";
   const email = session?.user?.email || "";
@@ -76,7 +76,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
     } else {
       alert("✅ 닉네임이 변경되었습니다!");
       await refreshUser();
-      onClose();
+      setIsEditMode(false);
     }
   };
 
@@ -96,42 +96,95 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm mb-2">닉네임</label>
-            <input
-              type="text"
-              placeholder="닉네임 (2글자 이상)"
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-base"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              required
-              minLength={2}
-            />
-          </div>
+          {isEditMode ? (
+            <>
+              <div>
+                <label className="block text-sm mb-2">닉네임</label>
+                <input
+                  type="text"
+                  placeholder="닉네임 (2글자 이상)"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-base"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  required
+                  minLength={2}
+                />
+              </div>
 
-          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-            <p>로그인: {providerLabel}</p>
-            <p>이메일: {email}</p>
-            <p>랭크: {user?.rank}</p>
-            <p>포인트: {user?.points}P</p>
-          </div>
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary disabled:bg-gray-400"
+                >
+                  {isSubmitting ? "변경 중..." : "저장"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditMode(false);
+                    setNickname(user?.nickname || "");
+                  }}
+                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white py-3 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-bold"
+                >
+                  취소
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">닉네임</span>
+                  <span className="font-bold">{user?.nickname}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">로그인</span>
+                  <span>{providerLabel}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">이메일</span>
+                  <span className="text-xs">{email}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">랭크</span>
+                  <span className="font-bold text-bunny-primary">{user?.rank}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600 dark:text-gray-400">포인트</span>
+                  <span className="font-bold text-bunny-secondary">{user?.points}P</span>
+                </div>
+              </div>
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary disabled:bg-gray-400"
-            >
-              {isSubmitting ? "변경 중..." : "변경"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white py-3 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-bold"
-            >
-              취소
-            </button>
-          </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditMode(true)}
+                  className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary"
+                >
+                  수정
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white py-3 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-bold"
+                >
+                  닫기
+                </button>
+              </div>
+
+              <div className="text-right mt-2">
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                  className="text-xs text-gray-900 dark:text-gray-300 underline italic hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50"
+                >
+                  회원 탈퇴
+                </button>
+              </div>
+            </>
+          )}
 
           <button
             type="button"
