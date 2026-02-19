@@ -13,6 +13,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   addPoints: (points: number) => Promise<void>;
   refreshUser: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -99,6 +100,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    });
+    if (error) throw error;
+  };
+
   const addPoints = async (points: number) => {
     if (!user) return;
     
@@ -130,7 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithGoogle,
       signOut, 
       addPoints,
-      refreshUser
+      refreshUser,
+      resetPassword
     }}>
       {children}
     </AuthContext.Provider>

@@ -5,9 +5,13 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
-  const { user, refreshUser } = useAuth();
+  const { user, session, refreshUser } = useAuth();
   const [nickname, setNickname] = useState(user?.nickname || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const provider = session?.user?.app_metadata?.provider || "email";
+  const email = session?.user?.email || "";
+  const providerLabel = provider === "google" ? "🔵 구글" : "📧 이메일";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +83,9 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <p>로그인: {providerLabel}</p>
+            <p>이메일: {email}</p>
             <p>랭크: {user?.rank}</p>
             <p>포인트: {user?.points}P</p>
           </div>
