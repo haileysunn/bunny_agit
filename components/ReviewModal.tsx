@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase, SmokingArea, Review } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
+import AlertModal from "./AlertModal";
 
 export default function ReviewModal({
   area,
@@ -18,6 +19,7 @@ export default function ReviewModal({
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
 
   useEffect(() => {
     loadReviews();
@@ -46,7 +48,7 @@ export default function ReviewModal({
 
   const toggleFavorite = async () => {
     if (!user) {
-      alert("❌ 로그인이 필요합니다.");
+      setAlert({ message: "로그인이 필요합니다.", type: "error" });
       return;
     }
 
@@ -57,13 +59,13 @@ export default function ReviewModal({
         .eq("user_id", user.id)
         .eq("area_id", area.id);
       setIsFavorite(false);
-      alert("⭐ 즐겨찾기에서 제거되었습니다.");
+      setAlert({ message: "즐겨찾기에서 제거되었습니다.", type: "info" });
     } else {
       await supabase
         .from("favorites")
         .insert([{ user_id: user.id, area_id: area.id }]);
       setIsFavorite(true);
-      alert("⭐ 즐겨찾기에 추가되었습니다!");
+      setAlert({ message: "즐겨찾기에 추가되었습니다!", type: "success" });
     }
   };
 
@@ -131,14 +133,14 @@ export default function ReviewModal({
     setIsSubmitting(false);
 
     if (error) {
-      alert("❌ 리뷰 등록 실패: " + error.message);
+      setAlert({ message: "리뷰 등록 실패: " + error.message, type: "error" });
       console.error(error);
     } else {
       if (user) {
         await addPoints(50);
-        alert("✅ 리뷰 작성 완료! 50P 적립되었습니다 🎉");
+        setAlert({ message: "리뷰 작성 완료! 50P 적립되었습니다 🎉", type: "success" });
       } else {
-        alert("✅ 리뷰 작성 완료!");
+        setAlert({ message: "리뷰 작성 완료!", type: "success" });
       }
       loadReviews();
       setComment("");
@@ -280,6 +282,14 @@ export default function ReviewModal({
           닫기
         </button>
       </div>
+
+      {alert && (
+        <AlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+        />
+      )}
     </div>
   );
 }

@@ -37,12 +37,12 @@ export default function AlertModal({ message, onClose, type = "info" }: AlertMod
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm text-gray-900 dark:text-white shadow-xl animate-slide-in">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm text-gray-900 dark:text-white shadow-xl animate-in zoom-in-95 duration-200">
         <div className="flex items-start gap-3 mb-4">
           <span className={`text-3xl ${getColor()}`}>{getIcon()}</span>
           <p className="flex-1 whitespace-pre-line leading-relaxed">{message}</p>
