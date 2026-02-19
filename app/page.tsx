@@ -143,12 +143,12 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleFavoriteFilter}
-              className={`p-2 hover:bg-white/10 rounded-lg transition ${
+              className={`p-2 hover:bg-white/10 rounded-lg transition text-xl ${
                 showFavoritesOnly ? 'bg-white/20' : ''
               }`}
               title="즐겨찾기"
             >
-              {showFavoritesOnly ? "⭐" : "☆"}
+              {showFavoritesOnly ? "⭐" : "🔖"}
             </button>
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -167,19 +167,42 @@ export default function Home() {
                   <div className="text-xs">{getUserRank(user.points).title} | {user.points}P</div>
                 </button>
                 <button
+                  onClick={() => setShowProfileModal(true)}
+                  className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition text-xl"
+                  title="프로필"
+                >
+                  👤
+                </button>
+                <button
                   onClick={signOut}
-                  className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
+                  className="hidden sm:block px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
                 >
                   로그아웃
                 </button>
+                <button
+                  onClick={signOut}
+                  className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition text-xl"
+                  title="로그아웃"
+                >
+                  👋
+                </button>
               </div>
             ) : (
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded transition text-sm font-medium"
-              >
-                로그인
-              </button>
+              <>
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="hidden sm:block px-4 py-2 bg-white/20 hover:bg-white/30 rounded transition text-sm font-medium"
+                >
+                  로그인
+                </button>
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition text-xl"
+                  title="로그인"
+                >
+                  👤
+                </button>
+              </>
             )}
           </div>
         </div>

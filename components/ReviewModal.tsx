@@ -180,7 +180,7 @@ export default function ReviewModal({
             className="text-2xl hover:scale-110 transition text-bunny-secondary"
             title={isFavorite ? "즐겨찾기 제거" : "즐겨찾기 추가"}
           >
-            {isFavorite ? "⭐" : "☆"}
+            {isFavorite ? "⭐" : "🔖"}
           </button>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{area.address}</p>
@@ -245,30 +245,39 @@ export default function ReviewModal({
               <label className="block text-sm mb-2">청결도 ({cleanliness}점)</label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((score) => (
-                  <div key={score} className="relative inline-block">
-                    <button
-                      type="button"
-                      onClick={() => setCleanliness(score - 0.5)}
-                      className="absolute left-0 w-1/2 h-full z-10"
-                      style={{ opacity: 0 }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setCleanliness(score)}
-                      className="text-3xl transition hover:scale-110 relative"
-                    >
-                      {cleanliness >= score ? (
-                        <span>⭐</span>
-                      ) : cleanliness >= score - 0.5 ? (
-                        <span className="relative inline-block">
-                          <span className="text-gray-300 dark:text-gray-600">★</span>
-                          <span className="absolute left-0 top-0 overflow-hidden" style={{ width: '50%' }}>⭐</span>
-                        </span>
-                      ) : (
+                  <button
+                    key={score}
+                    type="button"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickX = e.clientX - rect.left;
+                      const isLeftHalf = clickX < rect.width / 2;
+                      
+                      if (cleanliness >= score) {
+                        // 꽉찬별이나 반별일 때
+                        if (cleanliness === score) {
+                          setCleanliness(score - 0.5);
+                        } else if (cleanliness === score - 0.5) {
+                          setCleanliness(score);
+                        }
+                      } else {
+                        // 회색별일 때
+                        setCleanliness(isLeftHalf ? score - 0.5 : score);
+                      }
+                    }}
+                    className="text-3xl transition hover:scale-110 cursor-pointer"
+                  >
+                    {cleanliness >= score ? (
+                      <span>⭐</span>
+                    ) : cleanliness >= score - 0.5 ? (
+                      <span className="relative inline-block">
                         <span className="text-gray-300 dark:text-gray-600">★</span>
-                      )}
-                    </button>
-                  </div>
+                        <span className="absolute left-0 top-0 overflow-hidden" style={{ width: '50%' }}>⭐</span>
+                      </span>
+                    ) : (
+                      <span className="text-gray-300 dark:text-gray-600">★</span>
+                    )}
+                  </button>
                 ))}
               </div>
             </div>
