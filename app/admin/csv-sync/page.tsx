@@ -149,7 +149,14 @@ export default function CSVSyncPage() {
           .eq('is_public_data', true)
           .maybeSingle();
         
-        if (existing) { skipped++; continue; }
+        if (existing) {
+          await supabase
+            .from('smoking_areas')
+            .update({ public_data_updated_at: mapping.dataDate || new Date().toISOString() })
+            .eq('id', existing.id);
+          skipped++;
+          continue;
+        }
         
         const { error } = await supabase.from('smoking_areas').insert({
           name,
