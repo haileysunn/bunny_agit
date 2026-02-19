@@ -96,13 +96,13 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
               <span className="text-gray-600 dark:text-gray-400">닉네임</span>
               {isEditMode ? (
                 <input
                   type="text"
-                  className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-sm"
+                  className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                   required
@@ -114,7 +114,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
             </div>
             <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
               <span className="text-gray-600 dark:text-gray-400">로그인</span>
-              <span className="text-xs">{email} ({providerLabel})</span>
+              <span>{email} ({providerLabel})</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
               <span className="text-gray-600 dark:text-gray-400">랭크</span>
@@ -176,15 +176,6 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
               </button>
             </div>
           )}
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isSubmitting}
-            className="w-full mt-2 text-sm text-red-600 dark:text-red-400 hover:underline disabled:opacity-50"
-          >
-            회원 탈퇴
-          </button>
         </form>
       </div>
     </div>
