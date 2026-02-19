@@ -98,7 +98,7 @@ export default function KakaoMap({
       markersRef.current.push(marker);
 
       const infowindow = new window.kakao.maps.InfoWindow({
-        content: `<div style="padding:10px;font-size:12px;">
+        content: `<div style="padding:8px 10px;font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
           <strong>🐰 ${area.name}</strong><br/>
           ${area.is_indoor ? "🏠 실내" : "🌳 실외"}
         </div>`,
