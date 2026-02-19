@@ -24,6 +24,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   
   const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toLocaleString('ko-KR', { 
     month: '2-digit', 
@@ -36,11 +38,12 @@ export default function Home() {
 
   useEffect(() => {
     loadAreas();
-  }, []);
+    if (user) loadFavorites();
+  }, [user]);
 
   useEffect(() => {
-    setFilteredAreas(areas);
-  }, [areas]);
+    applyFilters();
+  }, [areas, showFavoritesOnly, favoriteIds]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -52,6 +55,36 @@ export default function Home() {
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [showReportModal, showReviewModal]);
+
+  const loadFavorites = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("favorites")
+      .select("area_id")
+      .eq("user_id", user.id);
+    if (data) {
+      setFavoriteIds(data.map(f => f.area_id));
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = areas;
+    if (showFavoritesOnly && favoriteIds.length > 0) {
+      filtered = areas.filter(area => favoriteIds.includes(area.id));
+    }
+    setFilteredAreas(filtered);
+  };
+
+  const toggleFavoriteFilter = () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setShowFavoritesOnly(!showFavoritesOnly);
+    if (!showFavoritesOnly && favoriteIds.length === 0) {
+      setToast({ message: "즐겨찾기한 아지트가 없습니다", type: "info" });
+    }
+  };
 
   const loadAreas = async () => {
     setLoading(true);
@@ -103,6 +136,15 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={toggleFavoriteFilter}
+              className={`p-2 hover:bg-white/10 rounded-lg transition ${
+                showFavoritesOnly ? 'bg-white/20' : ''
+              }`}
+              title="즐겨찾기"
+            >
+              {showFavoritesOnly ? "⭐" : "☆"}
+            </button>
+            <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 hover:bg-white/10 rounded-lg transition"
               title={darkMode ? "라이트 모드" : "다크 모드"}
@@ -149,7 +191,7 @@ export default function Home() {
         
         <button
           onClick={() => setShowReportModal(true)}
-          className="absolute bottom-6 right-4 md:right-6 bg-bunny-secondary text-gray-900 px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:bg-yellow-500 transition z-50 text-sm md:text-base font-bold"
+          className="absolute bottom-6 right-4 md:right-6 bg-bunny-primary text-white px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:bg-bunny-secondary transition z-50 text-sm md:text-base font-bold"
         >
           🥕 제보
         </button>

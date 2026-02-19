@@ -124,7 +124,7 @@ export default function ReviewModal({
         user_id: user?.id,
         cleanliness,
         is_available: isAvailable,
-        comment,
+        comment: comment.trim() || null,
       },
     ]);
 
