@@ -20,6 +20,7 @@ export default function KakaoMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const infowindowsRef = useRef<any[]>([]);
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
 
   const moveToCurrentLocation = () => {
@@ -79,6 +80,10 @@ export default function KakaoMap({
     // 기존 마커 제거
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
+    
+    // 기존 인포윈도우 닫기
+    infowindowsRef.current.forEach(infowindow => infowindow.close());
+    infowindowsRef.current = [];
 
     if (areas.length === 0) return;
 
@@ -106,7 +111,10 @@ export default function KakaoMap({
         </div>`,
       });
 
+      infowindowsRef.current.push(infowindow);
+
       window.kakao.maps.event.addListener(marker, "click", () => {
+        infowindow.close();
         onAreaClick(area);
       });
 
