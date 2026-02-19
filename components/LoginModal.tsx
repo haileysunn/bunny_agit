@@ -21,20 +21,30 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
         alert("✅ 비밀번호 재설정 이메일을 발송했습니다. 이메일을 확인해주세요.");
         setMode('signin');
       } else if (mode === 'signup') {
-        await signUp(email, password);
-        alert("✅ 회원가입 완료!");
-        onClose();
+        // 회원가입 시도
+        try {
+          await signUp(email, password);
+          alert("✅ 회원가입 완료!");
+          onClose();
+        } catch (signupError: any) {
+          // 이미 존재하는 이메일인 경우 로그인 시도해보기
+          if (signupError.message?.includes("already registered")) {
+            alert("❌ 이미 가입된 이메일입니다.\n\n구글로 가입하셨다면 🔵 Google로 로그인 버튼을 사용해주세요.");
+          } else {
+            throw signupError;
+          }
+        }
       } else {
+        // 로그인 시도
         await signIn(email, password);
         alert("✅ 로그인 성공! 🐰");
         onClose();
       }
     } catch (error: any) {
       const errorMsg = error.message || "";
-      if (errorMsg.includes("already registered") || errorMsg.includes("already exists")) {
-        alert("❌ 이미 가입된 이메일입니다. 로그인하거나 다른 이메일을 사용해주세요.");
-      } else if (errorMsg.includes("Invalid login credentials")) {
-        alert("❌ 이메일 또는 비밀번호가 올바르지 않습니다.");
+      
+      if (errorMsg.includes("Invalid login credentials")) {
+        alert("❌ 이메일 또는 비밀번호가 올바르지 않습니다.\n\n구글로 가입하셨다면 🔵 Google로 로그인 버튼을 사용해주세요.");
       } else {
         alert("❌ " + (errorMsg || "로그인 실패"));
       }
@@ -54,11 +64,12 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div 
         className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm text-gray-900 dark:text-white"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-4">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />

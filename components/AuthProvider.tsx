@@ -14,6 +14,7 @@ type AuthContextType = {
   addPoints: (points: number) => Promise<void>;
   refreshUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -100,6 +101,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
   };
 
+  const deleteAccount = async () => {
+    if (!user || !session) return;
+    
+    // 1. users 테이블 데이터 삭제 (CASCADE로 관련 데이터 자동 삭제)
+    await supabase.from('users').delete().eq('id', user.id);
+    
+    // 2. auth 계정 삭제
+    await supabase.rpc('delete_user');
+    
+    // 3. 로그아웃
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+  };
+
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`
@@ -139,7 +155,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signOut, 
       addPoints,
       refreshUser,
-      resetPassword
+      resetPassword,
+      deleteAccount
     }}>
       {children}
     </AuthContext.Provider>

@@ -5,13 +5,38 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 
 export default function ProfileModal({ onClose }: { onClose: () => void }) {
-  const { user, session, refreshUser } = useAuth();
+  const { user, session, refreshUser, deleteAccount } = useAuth();
   const [nickname, setNickname] = useState(user?.nickname || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const provider = session?.user?.app_metadata?.provider || "email";
   const email = session?.user?.email || "";
   const providerLabel = provider === "google" ? "🔵 구글" : "📧 이메일";
+
+  const handleDelete = async () => {
+    const confirmMsg = `⚠️ 정말로 탈퇴하시겠습니까?\n\n삭제되는 데이터:\n• 닉네임: ${user?.nickname}\n• 랭크: ${user?.rank}\n• 포인트: ${user?.points}P\n• 작성한 모든 리뷰\n• 제보한 모든 아지트\n• 즐겨찾기 목록\n\n⚠️ 탈퇴 후 복구가 불가능합니다.`;
+    
+    if (!confirm(confirmMsg)) {
+      return;
+    }
+
+    const finalConfirm = confirm("정말로 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.");
+    if (!finalConfirm) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await deleteAccount();
+      alert("✅ 회원 탈퇴가 완료되었습니다.\n그동안 bunnyAgit을 이용해주셔서 감사합니다. 🐰");
+      onClose();
+    } catch (error: any) {
+      alert("❌ 탈퇴 실패: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,11 +83,12 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div 
         className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm text-gray-900 dark:text-white"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-4">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
@@ -106,6 +132,15 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
               취소
             </button>
           </div>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isSubmitting}
+            className="w-full mt-2 text-sm text-red-600 dark:text-red-400 hover:underline disabled:opacity-50"
+          >
+            회원 탈퇴
+          </button>
         </form>
       </div>
     </div>
