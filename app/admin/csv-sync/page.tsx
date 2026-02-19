@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 export default function CSVSyncPage() {
   const [file, setFile] = useState<File | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [sampleData, setSampleData] = useState<any>({});
   const [mapping, setMapping] = useState({ name: '', address: '', lat: '', lng: '', indoor: '', source: '', dataDate: '' });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
@@ -18,8 +19,16 @@ export default function CSVSyncPage() {
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      const h = text.split('\n')[0].split(',').map(s => s.trim());
+      const lines = text.split('\n').filter(l => l.trim());
+      const h = lines[0].split(',').map(s => s.trim());
       setHeaders(h);
+      
+      if (lines[1]) {
+        const values = lines[1].split(',');
+        const sample: any = {};
+        h.forEach((header, idx) => sample[header] = values[idx]?.trim() || '');
+        setSampleData(sample);
+      }
     };
     reader.readAsText(f, 'EUC-KR');
   };
@@ -94,7 +103,7 @@ export default function CSVSyncPage() {
           is_public_data: true,
           public_data_source: mapping.source || '서울시',
           public_data_updated_at: mapping.dataDate || new Date().toISOString(),
-          verification_count: 10,
+          verification_count: 0,
           is_verified: true,
         });
         
@@ -126,7 +135,7 @@ export default function CSVSyncPage() {
                 <label className="block mb-1">시설명 컬럼</label>
                 <select onChange={(e) => setMapping({...mapping, name: e.target.value})} className="w-full bg-gray-700 p-2 rounded">
                   <option value="">선택 (비어있으면 주소에서 추출)</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {headers.map(h => <option key={h} value={h}>{h} ({sampleData[h] || ''})</option>)}
                 </select>
               </div>
               
@@ -134,7 +143,7 @@ export default function CSVSyncPage() {
                 <label className="block mb-1">주소 컬럼 *</label>
                 <select onChange={(e) => setMapping({...mapping, address: e.target.value})} className="w-full bg-gray-700 p-2 rounded">
                   <option value="">선택</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {headers.map(h => <option key={h} value={h}>{h} ({sampleData[h] || ''})</option>)}
                 </select>
               </div>
               
@@ -142,7 +151,7 @@ export default function CSVSyncPage() {
                 <label className="block mb-1">위도 컬럼</label>
                 <select onChange={(e) => setMapping({...mapping, lat: e.target.value})} className="w-full bg-gray-700 p-2 rounded">
                   <option value="">선택 (비어있으면 주소로 변환)</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {headers.map(h => <option key={h} value={h}>{h} ({sampleData[h] || ''})</option>)}
                 </select>
               </div>
               
@@ -150,7 +159,7 @@ export default function CSVSyncPage() {
                 <label className="block mb-1">경도 컬럼</label>
                 <select onChange={(e) => setMapping({...mapping, lng: e.target.value})} className="w-full bg-gray-700 p-2 rounded">
                   <option value="">선택 (비어있으면 주소로 변환)</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {headers.map(h => <option key={h} value={h}>{h} ({sampleData[h] || ''})</option>)}
                 </select>
               </div>
               
@@ -158,7 +167,7 @@ export default function CSVSyncPage() {
                 <label className="block mb-1">실내외 구분 컬럼</label>
                 <select onChange={(e) => setMapping({...mapping, indoor: e.target.value})} className="w-full bg-gray-700 p-2 rounded">
                   <option value="">선택 (비어있으면 실외로 처리)</option>
-                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                  {headers.map(h => <option key={h} value={h}>{h} ({sampleData[h] || ''})</option>)}
                 </select>
               </div>
               
