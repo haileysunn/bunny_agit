@@ -18,7 +18,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
     try {
       if (mode === 'reset') {
         await resetPassword(email);
-        alert("✅ 비밀번호 재설정 이메일을 발송했습니다. 이메일을 확인해주세요.");
+        alert("✅ 비밀번호 재설정 이메일을 발송했습니다.\n\n• 가입된 이메일이면 메일을 확인해주세요.\n• 메일이 오지 않으면 가입되지 않은 이메일입니다.\n• 구글로 가입하셨다면 비밀번호 재설정이 불가능합니다.");
         setMode('signin');
       } else if (mode === 'signup') {
         // 회원가입 시도
