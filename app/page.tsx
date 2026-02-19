@@ -208,7 +208,11 @@ export default function Home() {
           onSuccess={() => {
             loadAreas();
             setShowReportModal(false);
-            setToast({ message: "아지트 제보 완료! 100P 적립되었습니다 🎉", type: "success" });
+            if (user) {
+              setToast({ message: "아지트 제보 완료! 100P 적립되었습니다 🎉", type: "success" });
+            } else {
+              setToast({ message: "아지트 제보 완료!", type: "success" });
+            }
           }}
         />
       )}

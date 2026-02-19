@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 import AlertModal from "./AlertModal";
+import ConfirmModal from "./ConfirmModal";
 
 export default function ReportModal({
   onClose,
@@ -23,6 +24,7 @@ export default function ReportModal({
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
+  const [confirm, setConfirm] = useState<{ message: string; onConfirm: () => void } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstance = useRef<any>(null);
@@ -105,8 +107,24 @@ export default function ReportModal({
     return R * c;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleReportClick = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      setConfirm({
+        message: "로그인하면 제보 시 100P를 적립받을 수 있습니다.\n\n로그인 없이 제보하시겠습니까?",
+        onConfirm: () => {
+          setConfirm(null);
+          handleSubmit();
+        }
+      });
+      return;
+    }
+    
+    handleSubmit();
+  };
+
+  const handleSubmit = async () => {
     if (isSubmitting) return;
 
     let reportLat = parseFloat(formData.latitude);
@@ -222,11 +240,15 @@ export default function ReportModal({
 
     setIsSubmitting(false);
     
-    if (verificationCount >= 3) {
-      setAlert({ message: "제보 완료! 검증 완료되어 지도에 표시됩니다.", type: "success" });
-    } else {
-      setAlert({ message: `제보 완료! (${verificationCount}/3명)\n3명 이상 제보 시 지도에 표시됩니다.`, type: "success" });
-    }
+    const successMessage = user 
+      ? (verificationCount >= 3 
+          ? "제보 완료! 100P 적립 🎉\n검증 완료되어 지도에 표시됩니다." 
+          : `제보 완료! 100P 적립 🎉\n(${verificationCount}/3명)\n3명 이상 제보 시 지도에 표시됩니다.`)
+      : (verificationCount >= 3
+          ? "제보 완료!\n검증 완료되어 지도에 표시됩니다."
+          : `제보 완료!\n(${verificationCount}/3명)\n3명 이상 제보 시 지도에 표시됩니다.`);
+    
+    setAlert({ message: successMessage, type: "success" });
     setTimeout(() => onSuccess(), 1500);
   };
 
@@ -315,7 +337,7 @@ export default function ReportModal({
           <img src="/assets/images/logo_rabbit_white.png" alt="BunnyAgit" className="w-8 h-8 hidden dark:block" />
           <h2 className="text-2xl font-bold">새 아지트 제보</h2>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleReportClick} className="space-y-4">
           <input
             type="text"
             placeholder="장소명"
@@ -395,6 +417,15 @@ export default function ReportModal({
           message={alert.message}
           type={alert.type}
           onClose={() => setAlert(null)}
+        />
+      )}
+
+      {confirm && (
+        <ConfirmModal
+          message={confirm.message}
+          type="info"
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm(null)}
         />
       )}
     </div>
