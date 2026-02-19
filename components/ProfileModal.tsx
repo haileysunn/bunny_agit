@@ -92,32 +92,49 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center gap-2 mb-4">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
-          <h2 className="text-2xl font-bold">프로필 수정</h2>
+          <h2 className="text-2xl font-bold">프로필 정보</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {isEditMode ? (
-            <>
-              <div>
-                <label className="block text-sm mb-2">닉네임</label>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+              <span className="text-gray-600 dark:text-gray-400">닉네임</span>
+              {isEditMode ? (
                 <input
                   type="text"
-                  placeholder="닉네임 (2글자 이상)"
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-base"
+                  className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white dark:bg-gray-700 text-sm"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                   required
                   minLength={2}
                 />
-              </div>
+              ) : (
+                <span className="font-bold">{user?.nickname}</span>
+              )}
+            </div>
+            <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+              <span className="text-gray-600 dark:text-gray-400">로그인</span>
+              <span className="text-xs">{email} ({providerLabel})</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
+              <span className="text-gray-600 dark:text-gray-400">랭크</span>
+              <span className="font-bold text-bunny-primary">{user?.rank}</span>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-gray-600 dark:text-gray-400">포인트</span>
+              <span className="font-bold text-bunny-secondary">{user?.points}P</span>
+            </div>
+          </div>
 
+          {isEditMode ? (
+            <>
               <div className="flex gap-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary disabled:bg-gray-400"
                 >
-                  {isSubmitting ? "변경 중..." : "저장"}
+                  {isSubmitting ? "변경 중..." : "변경"}
                 </button>
                 <button
                   type="button"
@@ -130,50 +147,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
                   취소
                 </button>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">닉네임</span>
-                  <span className="font-bold">{user?.nickname}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">로그인</span>
-                  <span>{providerLabel}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">이메일</span>
-                  <span className="text-xs">{email}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">랭크</span>
-                  <span className="font-bold text-bunny-primary">{user?.rank}</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">포인트</span>
-                  <span className="font-bold text-bunny-secondary">{user?.points}P</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEditMode(true)}
-                  className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary"
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white py-3 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-bold"
-                >
-                  닫기
-                </button>
-              </div>
-
-              <div className="text-right mt-2">
+              <div className="text-right">
                 <button
                   type="button"
                   onClick={handleDelete}
@@ -184,6 +158,23 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
                 </button>
               </div>
             </>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setIsEditMode(true)}
+                className="flex-1 bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary"
+              >
+                수정
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white py-3 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-bold"
+              >
+                닫기
+              </button>
+            </div>
           )}
 
           <button
