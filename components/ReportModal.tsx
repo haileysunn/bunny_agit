@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "./AuthProvider";
 
 export default function ReportModal({
   onClose,
@@ -10,6 +11,7 @@ export default function ReportModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const { user, addPoints } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -206,9 +208,15 @@ export default function ReportModal({
     if (areaId) {
       await supabase.from('area_reports').insert([{
         area_id: areaId,
+        user_id: user?.id,
         reporter_location_lat: currentLocation.lat,
         reporter_location_lng: currentLocation.lng
       }]);
+      
+      // 포인트 적립
+      if (user) {
+        await addPoints(100);
+      }
     }
 
     setIsSubmitting(false);

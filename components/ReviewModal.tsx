@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase, SmokingArea, Review } from "@/lib/supabase";
+import { useAuth } from "./AuthProvider";
 
 export default function ReviewModal({
   area,
@@ -10,15 +11,18 @@ export default function ReviewModal({
   area: SmokingArea;
   onClose: () => void;
 }) {
+  const { user, addPoints } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [cleanliness, setCleanliness] = useState(5);
   const [isAvailable, setIsAvailable] = useState(true);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     loadReviews();
-  }, []);
+    if (user) checkFavorite();
+  }, [user]);
 
   const loadReviews = async () => {
     const { data } = await supabase
@@ -27,6 +31,40 @@ export default function ReviewModal({
       .eq("area_id", area.id)
       .order("created_at", { ascending: false });
     if (data) setReviews(data);
+  };
+
+  const checkFavorite = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("favorites")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("area_id", area.id)
+      .single();
+    setIsFavorite(!!data);
+  };
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      alert("❌ 로그인이 필요합니다.");
+      return;
+    }
+
+    if (isFavorite) {
+      await supabase
+        .from("favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("area_id", area.id);
+      setIsFavorite(false);
+      alert("⭐ 즐겨찾기에서 제거되었습니다.");
+    } else {
+      await supabase
+        .from("favorites")
+        .insert([{ user_id: user.id, area_id: area.id }]);
+      setIsFavorite(true);
+      alert("⭐ 즐겨찾기에 추가되었습니다!");
+    }
   };
 
   const calculateTrust = () => {
@@ -83,6 +121,7 @@ export default function ReviewModal({
     const { error } = await supabase.from("reviews").insert([
       {
         area_id: area.id,
+        user_id: user?.id,
         cleanliness,
         is_available: isAvailable,
         comment,
@@ -95,7 +134,12 @@ export default function ReviewModal({
       alert("❌ 리뷰 등록 실패: " + error.message);
       console.error(error);
     } else {
-      alert("✅ 리뷰 작성 완료!");
+      if (user) {
+        await addPoints(50);
+        alert("✅ 리뷰 작성 완료! 50P 적립되었습니다 🎉");
+      } else {
+        alert("✅ 리뷰 작성 완료!");
+      }
       loadReviews();
       setComment("");
       setCleanliness(5);
@@ -119,7 +163,14 @@ export default function ReviewModal({
       >
         <div className="flex items-center gap-2 mb-2">
           <img src="/assets/images/logo_rabbit.png" alt="BunnyAgit" className="w-8 h-8" />
-          <h2 className="text-2xl font-bold">{area.name}</h2>
+          <h2 className="text-2xl font-bold flex-1">{area.name}</h2>
+          <button
+            onClick={toggleFavorite}
+            className="text-2xl hover:scale-110 transition"
+            title={isFavorite ? "즐겨찾기 제거" : "즐겨찾기 추가"}
+          >
+            {isFavorite ? "⭐" : "☆"}
+          </button>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{area.address}</p>
         

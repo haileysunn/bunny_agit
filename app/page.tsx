@@ -7,13 +7,17 @@ import ReviewModal from "@/components/ReviewModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
 import SearchBar from "@/components/SearchBar";
+import LoginModal from "@/components/LoginModal";
 import { supabase, SmokingArea } from "@/lib/supabase";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
+  const { user, logout } = useAuth();
   const [areas, setAreas] = useState<SmokingArea[]>([]);
   const [filteredAreas, setFilteredAreas] = useState<SmokingArea[]>([]);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState<SmokingArea | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
@@ -102,7 +106,28 @@ export default function Home() {
             >
               {darkMode ? "☀️" : "🌙"}
             </button>
-            <p className="text-xs md:text-sm hidden sm:block">길 위에서 찾은 우리만의 아지트</p>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-bold">{user.nickname}</div>
+                  <div className="text-xs">{user.rank} | {user.points}P</div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
+                >
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded transition text-sm font-medium"
+              >
+                로그인
+              </button>
+            )}
+            <p className="text-xs md:text-sm hidden md:block">길 위에서 찾은 우리만의 아지트</p>
           </div>
         </div>
       </header>
@@ -140,6 +165,10 @@ export default function Home() {
           area={selectedArea}
           onClose={() => setShowReviewModal(false)}
         />
+      )}
+
+      {showLoginModal && (
+        <LoginModal onClose={() => setShowLoginModal(false)} />
       )}
 
       {toast && (

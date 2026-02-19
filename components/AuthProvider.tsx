@@ -28,14 +28,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (nickname: string) => {
-    const { data } = await supabase
+    // 기존 사용자 확인
+    const { data: existingUser } = await supabase
       .from("users")
-      .insert([{ nickname }])
-      .select()
+      .select("*")
+      .eq("nickname", nickname)
       .single();
-    if (data) {
-      setUser(data);
-      localStorage.setItem("userId", data.id);
+
+    if (existingUser) {
+      setUser(existingUser);
+      localStorage.setItem("userId", existingUser.id);
+    } else {
+      // 새 사용자 생성
+      const { data } = await supabase
+        .from("users")
+        .insert([{ nickname }])
+        .select()
+        .single();
+      if (data) {
+        setUser(data);
+        localStorage.setItem("userId", data.id);
+      }
     }
   };
 

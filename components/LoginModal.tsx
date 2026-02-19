@@ -5,12 +5,23 @@ import { useAuth } from "./AuthProvider";
 
 export default function LoginModal({ onClose }: { onClose: () => void }) {
   const [nickname, setNickname] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(nickname);
-    onClose();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      await login(nickname);
+      alert(`✅ 환영합니다, ${nickname}님! 🐰`);
+      onClose();
+    } catch (error) {
+      alert("❌ 로그인 실패. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -30,16 +41,18 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
           <input
             type="text"
             placeholder="닉네임 입력"
-            className="w-full p-3 border border-gray-300 rounded mb-4 text-gray-900"
+            className="w-full p-3 border border-gray-300 rounded mb-4 text-gray-900 text-base"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
+            maxLength={20}
             required
           />
           <button
             type="submit"
-            className="w-full bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary"
+            disabled={isSubmitting}
+            className="w-full bg-bunny-primary text-white py-3 rounded font-bold hover:bg-bunny-secondary disabled:bg-gray-400"
           >
-            시작하기
+            {isSubmitting ? "로그인 중..." : "시작하기"}
           </button>
         </form>
       </div>
