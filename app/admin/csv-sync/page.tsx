@@ -15,9 +15,13 @@ export default function CSVSyncPage() {
     if (!f) return;
     
     setFile(f);
-    const text = await f.text();
-    const h = text.split('\n')[0].split(',').map(s => s.trim());
-    setHeaders(h);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const h = text.split('\n')[0].split(',').map(s => s.trim());
+      setHeaders(h);
+    };
+    reader.readAsText(f, 'UTF-8');
   };
 
   const handleSync = async () => {
@@ -26,50 +30,54 @@ export default function CSVSyncPage() {
     setLoading(true);
     setResult('처리 중...');
     
-    const text = await file.text();
-    const lines = text.split('\n').filter(l => l.trim());
-    const headers = lines[0].split(',').map(s => s.trim());
-    
-    let inserted = 0, skipped = 0;
-    
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
-      const row: any = {};
-      headers.forEach((h, idx) => row[h] = values[idx]?.trim() || '');
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(l => l.trim());
+      const headers = lines[0].split(',').map(s => s.trim());
       
-      const lat = parseFloat(row[mapping.lat] || '0');
-      const lng = parseFloat(row[mapping.lng] || '0');
+      let inserted = 0, skipped = 0;
       
-      if (!lat || !lng) { skipped++; continue; }
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        const row: any = {};
+        headers.forEach((h, idx) => row[h] = values[idx]?.trim() || '');
+        
+        const lat = parseFloat(row[mapping.lat] || '0');
+        const lng = parseFloat(row[mapping.lng] || '0');
+        
+        if (!lat || !lng) { skipped++; continue; }
+        
+        const { data: existing } = await supabase
+          .from('smoking_areas')
+          .select('id')
+          .eq('latitude', lat)
+          .eq('longitude', lng)
+          .eq('is_public_data', true)
+          .single();
+        
+        if (existing) { skipped++; continue; }
+        
+        const { error } = await supabase.from('smoking_areas').insert({
+          name: row[mapping.name] || '흡연구역',
+          address: row[mapping.address] || '',
+          latitude: lat,
+          longitude: lng,
+          is_indoor: mapping.indoor ? row[mapping.indoor]?.includes('실내') : false,
+          is_public_data: true,
+          public_data_source: mapping.source || '서울시',
+          public_data_updated_at: new Date().toISOString(),
+          verification_count: 10,
+          is_verified: true,
+        });
+        
+        error ? skipped++ : inserted++;
+      }
       
-      const { data: existing } = await supabase
-        .from('smoking_areas')
-        .select('id')
-        .eq('latitude', lat)
-        .eq('longitude', lng)
-        .eq('is_public_data', true)
-        .single();
-      
-      if (existing) { skipped++; continue; }
-      
-      const { error } = await supabase.from('smoking_areas').insert({
-        name: row[mapping.name] || '흡연구역',
-        address: row[mapping.address] || '',
-        latitude: lat,
-        longitude: lng,
-        is_indoor: mapping.indoor ? row[mapping.indoor]?.includes('실내') : false,
-        is_public_data: true,
-        public_data_source: mapping.source || '서울시',
-        public_data_updated_at: new Date().toISOString(),
-        verification_count: 10,
-        is_verified: true,
-      });
-      
-      error ? skipped++ : inserted++;
-    }
-    
-    setResult(`✅ ${inserted}개 추가, ⏭️ ${skipped}개 스킵`);
-    setLoading(false);
+      setResult(`✅ ${inserted}개 추가, ⏭️ ${skipped}개 스킵`);
+      setLoading(false);
+    };
+    reader.readAsText(file, 'UTF-8');
   };
 
   return (
