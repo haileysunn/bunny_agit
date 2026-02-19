@@ -10,6 +10,7 @@ export default function CSVSyncPage() {
   const [mapping, setMapping] = useState({ name: '', address: '', lat: '', lng: '', indoor: '', source: '', dataDate: '' });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -51,6 +52,7 @@ export default function CSVSyncPage() {
     
     setLoading(true);
     setResult('처리 중...');
+    setProgress({ current: 0, total: 0 });
     
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -58,9 +60,15 @@ export default function CSVSyncPage() {
       const lines = text.split('\n').filter(l => l.trim());
       const headers = lines[0].split(',').map(s => s.trim());
       
+      const total = lines.length - 1;
+      setProgress({ current: 0, total });
+      
       let inserted = 0, skipped = 0, failed = 0;
       
       for (let i = 1; i < lines.length; i++) {
+        setProgress({ current: i, total });
+        setResult(`처리 중... ${i}/${total}`);
+        
         const values = lines[i].split(',');
         const row: any = {};
         headers.forEach((h, idx) => row[h] = values[idx]?.trim() || '');
@@ -202,6 +210,16 @@ export default function CSVSyncPage() {
           
           {result && (
             <div className="mt-4 p-4 bg-gray-700 rounded">
+              {loading && progress.total > 0 && (
+                <div className="mb-2">
+                  <div className="w-full bg-gray-600 rounded-full h-2">
+                    <div 
+                      className="bg-purple-600 h-2 rounded-full transition-all"
+                      style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
               {result}
             </div>
           )}
