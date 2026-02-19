@@ -21,7 +21,7 @@ export default function CSVSyncPage() {
       const h = text.split('\n')[0].split(',').map(s => s.trim());
       setHeaders(h);
     };
-    reader.readAsText(f, 'UTF-8');
+    reader.readAsText(f, 'EUC-KR');
   };
 
   const handleSync = async () => {
@@ -77,7 +77,7 @@ export default function CSVSyncPage() {
       setResult(`✅ ${inserted}개 추가, ⏭️ ${skipped}개 스킵`);
       setLoading(false);
     };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file, 'EUC-KR');
   };
 
   return (
