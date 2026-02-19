@@ -10,10 +10,9 @@ type AuthContextType = {
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signInWithKakao: () => Promise<void>;
   signOut: () => Promise<void>;
   addPoints: (points: number) => Promise<void>;
-  updateNickname: (nickname: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -88,17 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) throw error;
-  };
-
-  const signInWithKakao = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: window.location.origin
+        redirectTo: `${window.location.origin}/`
       }
     });
     if (error) throw error;
@@ -127,17 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data) setUser(data);
   };
 
-  const updateNickname = async (nickname: string) => {
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("users")
-      .update({ nickname })
-      .eq("id", user.id)
-      .select()
-      .single();
-
-    if (data) setUser(data);
+  const refreshUser = async () => {
+    if (!session) return;
+    await loadUserProfile(session.user.id);
   };
 
   return (
@@ -147,10 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp, 
       signIn, 
       signInWithGoogle,
-      signInWithKakao,
       signOut, 
       addPoints,
-      updateNickname
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

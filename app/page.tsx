@@ -8,6 +8,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
 import SearchBar from "@/components/SearchBar";
 import LoginModal from "@/components/LoginModal";
+import ProfileModal from "@/components/ProfileModal";
 import { supabase, SmokingArea } from "@/lib/supabase";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -18,6 +19,7 @@ export default function Home() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState<SmokingArea | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
@@ -108,10 +110,13 @@ export default function Home() {
             </button>
             {user ? (
               <div className="flex items-center gap-2">
-                <div className="text-right hidden sm:block">
+                <button
+                  onClick={() => setShowProfileModal(true)}
+                  className="text-right hidden sm:block hover:bg-white/10 px-2 py-1 rounded transition"
+                >
                   <div className="text-sm font-bold">{user.nickname}</div>
                   <div className="text-xs">{user.rank} | {user.points}P</div>
-                </div>
+                </button>
                 <button
                   onClick={signOut}
                   className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition"
@@ -169,6 +174,10 @@ export default function Home() {
 
       {showLoginModal && (
         <LoginModal onClose={() => setShowLoginModal(false)} />
+      )}
+
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
       )}
 
       {toast && (
