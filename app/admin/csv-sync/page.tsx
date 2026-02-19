@@ -36,14 +36,23 @@ export default function CSVSyncPage() {
 
   const getCoordsByAddress = async (address: string): Promise<{lat: number, lng: number} | null> => {
     return new Promise((resolve) => {
-      const geocoder = new (window as any).kakao.maps.services.Geocoder();
-      geocoder.addressSearch(address, (result: any, status: any) => {
-        if (status === (window as any).kakao.maps.services.Status.OK) {
-          resolve({ lat: parseFloat(result[0].y), lng: parseFloat(result[0].x) });
+      const checkKakao = () => {
+        if ((window as any).kakao?.maps?.services) {
+          const geocoder = new (window as any).kakao.maps.services.Geocoder();
+          geocoder.addressSearch(address, (result: any, status: any) => {
+            if (status === (window as any).kakao.maps.services.Status.OK) {
+              resolve({ lat: parseFloat(result[0].y), lng: parseFloat(result[0].x) });
+            } else {
+              resolve(null);
+            }
+          });
+        } else if ((window as any).kakao?.maps?.load) {
+          (window as any).kakao.maps.load(() => checkKakao());
         } else {
           resolve(null);
         }
-      });
+      };
+      checkKakao();
     });
   };
 
