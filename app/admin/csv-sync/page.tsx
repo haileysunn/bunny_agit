@@ -153,7 +153,7 @@ export default function CSVSyncPage() {
           address,
           latitude: lat,
           longitude: lng,
-          is_indoor: mapping.indoor ? (row[mapping.indoor]?.includes('실내') || row[mapping.indoor]?.includes('폐쇄')) : false,
+          is_indoor: mapping.indoor ? (row[mapping.indoor]?.includes('실내') || (row[mapping.indoor]?.includes('폐쇄') && !row[mapping.indoor]?.includes('부분'))) : false,
           is_public_data: true,
           public_data_source: mapping.source || '서울시',
           public_data_updated_at: mapping.dataDate || new Date().toISOString(),
