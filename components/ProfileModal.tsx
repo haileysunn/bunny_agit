@@ -15,7 +15,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
   const providerLabel = provider === "google" ? "🔵 구글" : "📧 이메일";
 
   const handleDelete = async () => {
-    const confirmMsg = `⚠️ 정말로 탈퇴하시겠습니까?\n\n삭제되는 데이터:\n• 닉네임: ${user?.nickname}\n• 랭크: ${user?.rank}\n• 포인트: ${user?.points}P\n• 작성한 모든 리뷰\n• 제보한 모든 아지트\n• 즐겨찾기 목록\n\n⚠️ 탈퇴 후 복구가 불가능합니다.`;
+    const confirmMsg = `⚠️ 정말로 탈퇴하시겠습니까?\n\n삭제되는 데이터:\n• 닉네임: ${user?.nickname}\n• 랭크: ${user?.rank}\n• 포인트: ${user?.points}P\n• 즐겨찾기 목록\n\n유지되는 데이터:\n• 작성한 리뷰 (익명 처리)\n• 제보한 아지트 (익명 처리)\n\n⚠️ 탈퇴 후 복구가 불가능합니다.`;
     
     if (!confirm(confirmMsg)) {
       return;
@@ -29,7 +29,7 @@ export default function ProfileModal({ onClose }: { onClose: () => void }) {
     setIsSubmitting(true);
     try {
       await deleteAccount();
-      alert("✅ 회원 탈퇴가 완료되었습니다.\n그동안 bunnyAgit을 이용해주셔서 감사합니다. 🐰");
+      alert("✅ 회원 탈퇴가 완료되었습니다.\n\n작성하신 리뷰와 제보는 커뮤니티를 위해 익명으로 유지됩니다.\n그동안 bunnyAgit을 이용해주셔서 감사합니다. 🐰");
       onClose();
     } catch (error: any) {
       alert("❌ 탈퇴 실패: " + error.message);
