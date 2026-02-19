@@ -101,11 +101,39 @@ export default function CSVSyncPage() {
         
         const extractNameFromAddress = (addr: string) => {
           const parts = addr.split(' ').filter(p => p);
-          // 4단어 이상: 마지막 부분 추출 (예: "서울시 관악구 봉천동 123-45 땅땅마트 주차장" -> "땅땅마트 주차장")
-          if (parts.length >= 5) return parts.slice(4).join(' ');
-          // 3단어: 도로명/지번 부분 (예: "서울시 관악구 관악로 1" -> "관악로 1", "서울시 관악구 봉천동" -> "봉천동")
-          if (parts.length >= 3) return parts.slice(2).join(' ');
-          return parts.slice(-2).join(' ');
+          
+          // 시군구 찾기 (시/구/군으로 끝나는 부분)
+          let startIdx = 0;
+          for (let i = 0; i < parts.length; i++) {
+            if (parts[i].endsWith('시') || parts[i].endsWith('구') || parts[i].endsWith('군')) {
+              startIdx = i + 1;
+              break;
+            }
+          }
+          
+          const remaining = parts.slice(startIdx);
+          if (remaining.length === 0) return parts.slice(-2).join(' ');
+          
+          // 동/로 찾기
+          let dongOrRoIdx = -1;
+          for (let i = 0; i < remaining.length; i++) {
+            if (remaining[i].endsWith('동') || remaining[i].endsWith('로') || remaining[i].endsWith('길')) {
+              dongOrRoIdx = i;
+              break;
+            }
+          }
+          
+          // 동/로 뒤에 추가 정보가 있으면 그것만 반환
+          if (dongOrRoIdx >= 0 && dongOrRoIdx < remaining.length - 2) {
+            return remaining.slice(dongOrRoIdx + 2).join(' ');
+          }
+          
+          // 동/로부터 반환
+          if (dongOrRoIdx >= 0) {
+            return remaining.slice(dongOrRoIdx).join(' ');
+          }
+          
+          return remaining.join(' ');
         };
         
         const name = row[mapping.name] || extractNameFromAddress(address) || '흡연구역';
