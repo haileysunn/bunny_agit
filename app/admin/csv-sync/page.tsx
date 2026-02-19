@@ -101,9 +101,11 @@ export default function CSVSyncPage() {
         
         const extractNameFromAddress = (addr: string) => {
           const parts = addr.split(' ').filter(p => p);
-          if (parts.length >= 4) return parts.slice(3).join(' '); // 시군구+동+번호+다른정보 -> 다른정보
-          if (parts.length === 3) return parts.slice(1).join(' '); // 시군구+동+번호 -> 동+번호
-          return parts.slice(-2).join(' '); // 기타
+          // 4단어 이상: 마지막 부분 추출 (예: "서울시 관악구 봉천동 123-45 땅땅마트 주차장" -> "땅땅마트 주차장")
+          if (parts.length >= 5) return parts.slice(4).join(' ');
+          // 3단어: 도로명/지번 부분 (예: "서울시 관악구 관악로 1" -> "관악로 1", "서울시 관악구 봉천동" -> "봉천동")
+          if (parts.length >= 3) return parts.slice(2).join(' ');
+          return parts.slice(-2).join(' ');
         };
         
         const name = row[mapping.name] || extractNameFromAddress(address) || '흡연구역';
