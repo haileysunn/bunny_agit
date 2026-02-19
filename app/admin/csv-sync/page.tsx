@@ -99,7 +99,14 @@ export default function CSVSyncPage() {
         
         if (!lat || !lng) { skipped++; continue; }
         
-        const name = row[mapping.name] || address.split(' ').slice(0, 3).join(' ') || '흡연구역';
+        const extractNameFromAddress = (addr: string) => {
+          const parts = addr.split(' ').filter(p => p);
+          if (parts.length >= 4) return parts.slice(3).join(' '); // 시군구+동+번호+다른정보 -> 다른정보
+          if (parts.length === 3) return parts.slice(1).join(' '); // 시군구+동+번호 -> 동+번호
+          return parts.slice(-2).join(' '); // 기타
+        };
+        
+        const name = row[mapping.name] || extractNameFromAddress(address) || '흡연구역';
         
         const { data: existing } = await supabase
           .from('smoking_areas')
