@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase';
 
 export default function CSVSyncPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -30,7 +30,6 @@ export default function CSVSyncPage() {
     const lines = text.split('\n').filter(l => l.trim());
     const headers = lines[0].split(',').map(s => s.trim());
     
-    const supabase = createClient();
     let inserted = 0, skipped = 0;
     
     for (let i = 1; i < lines.length; i++) {
