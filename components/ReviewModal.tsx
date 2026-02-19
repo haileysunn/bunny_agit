@@ -118,6 +118,11 @@ export default function ReviewModal({
     e.preventDefault();
     if (isSubmitting) return;
     
+    if (comment.trim() === "") {
+      setAlert({ message: "코멘트를 입력해주세요.", type: "error" });
+      return;
+    }
+    
     setIsSubmitting(true);
 
     const { error } = await supabase.from("reviews").insert([
@@ -245,11 +250,12 @@ export default function ReviewModal({
             이용 가능
           </label>
           <textarea
-            placeholder="코멘트 (선택)"
+            placeholder="코멘트"
             className="w-full p-2 border dark:border-gray-600 rounded mb-2 dark:bg-gray-600 dark:text-white text-base"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
+            required
           />
           <button
             type="submit"
